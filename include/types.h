@@ -12,6 +12,6 @@ typedef signed short int int16_t;
 typedef signed int int32_t;
 typedef signed long int64_t; 
 
-typedef int bool; // Just to be verbose
+typedef enum { true, false } bool;
 
 #endif // TYPES_H
