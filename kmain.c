@@ -1,4 +1,4 @@
-#include <basic.h>
+#include <kernel.h>
 #include <console.h>
 
 void kmain(void* mbd __unused, unsigned int magic)
@@ -8,5 +8,6 @@ void kmain(void* mbd __unused, unsigned int magic)
        kprint("Ooops, something went wrong! Terminated!n\n");
    }
    init_console();
-   kprint("Booting Akosix...\n\n");
+///   kprintf("Booting Akosix...\n");
+   kprintf("This is a test of %s with the answer of %d with a hex is %x\n", "Akosix", 42, 0xFFAACC00);
 }
