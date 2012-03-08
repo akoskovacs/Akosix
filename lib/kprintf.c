@@ -10,7 +10,6 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
    char *tmp;
    size_t asize = 0;
    size_t nsize = 0;
-   bool alter_fmt = false;
    char buffer[20];
    int num;
 
@@ -32,9 +31,6 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
                    asize += nsize;
                break;
 
-               case '#':
-                    alter_fmt = true;
-               /* FALLTHROUGH */
                case 'x': case 'p':
                     if (*fmt == 'x')
                         num = va_arg(ap, int);
@@ -42,18 +38,6 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
                         num = (unsigned int)va_arg(ap, void *);
 
                     tmp = itoa(num, buffer, 16);
-                    if (alter_fmt) {
-                        if (num > 0) {
-                            strcpy(dest+asize, "0x");
-                            asize += 2;
-                        } else {
-                            strcpy(dest+asize, "-0x");
-                            asize += 3;
-                            tmp++;  // The itoa adds the '-', but we don't need it
-                        }
-                        alter_fmt = false;
-                    }
-
                     nsize = strlen(tmp);
                     strncpy(dest+asize, tmp, size-asize);
                     asize += nsize;
