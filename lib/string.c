@@ -25,22 +25,17 @@ size_t strlen(const char *str)
     return str_size;
 }
 
-char *strncpy(char *dest, const char *src, size_t dest_size)
+char *strncpy(char *dest, const char *src, size_t count)
 {
-    size_t i;
-    if (src == NULL || dest == NULL)
-        return NULL;
+	char *tmp = dest;
 
-    for (i = 0; i < dest_size || src[i] != '\0'; i++) {
-        dest[i] = src[i];
-    }
-
-    while (i < dest_size) {
-        dest[i] = '\0';
-        i++;
-    }
-
-    return dest;
+	while (count) {
+		if ((*tmp = *src) != 0)
+			src++;
+		tmp++;
+		count--;
+	}
+	return dest;
 }
 
 int strcmp(const char *f, const char *s)
