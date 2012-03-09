@@ -63,6 +63,16 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
    return asize;
 }
 
+int snprintf(char *dest, size_t size, const char *fmt, ...)
+{
+    va_list ap;
+    int ret;
+    va_start(ap, fmt);
+    ret = vsnprintf(dest, size, fmt, ap);
+    va_end(ap);
+    return ret;
+}
+
 int kprintf(const char *fmt, ...)
 {
     int size;
