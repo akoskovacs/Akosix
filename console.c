@@ -9,66 +9,75 @@
 #define CONSOLE_WIDTH  80
 #define CONSOLE_HEIGHT 25
 #define VIDEORAM (struct console_font *)0xb8000 // Standard color screen
-#define CURRENT_POS_ADDR (VIDEORAM + (pos_y * CONSOLE_WIDTH + pos_x -1))
 
 static struct console_font *video_mem = (struct console_font *)VIDEORAM;
 static console_color_t console_forecolor = COLOR_WHITE;
 static console_color_t console_backcolor = COLOR_BLACK;
 static int pos_x = 0, pos_y = 0;
+static void print_spaces(int, int, int);
 
-static void print_spaces(int times);
-static struct console_font *next_console_char_addr();
+void set_forecolor(console_color_t color) { console_forecolor = color; }
+void set_backcolor(console_color_t color) { console_backcolor = color; }
 
 void init_console()
 {
     clear_console();
-    kprint("Initializing console...\n");
-}
-
-void set_forecolor(console_color_t color)
-{
-    console_forecolor = color;
-}
-
-void set_backcolor(console_color_t color)
-{
-    console_backcolor = color;
-}
-
-void print_spaces(int times)
-{
-    int i;
-    for (i = 0; i < times; i++) {
-        kputchar(' ');
-    }
 }
 
 void clear_console()
 {
-    print_spaces(CONSOLE_WIDTH * CONSOLE_HEIGHT);
-    pos_x = 0;
-    pos_y = 0;
+    print_spaces(0, 0, CONSOLE_HEIGHT*CONSOLE_WIDTH);
+}
+
+void kpos_putchar(char ch, int x, int y)
+{
+    struct console_font font;
+
+    if (x >= CONSOLE_WIDTH || y >= CONSOLE_HEIGHT)
+        return;
+
+    font.cf_char = ch;
+    font.cf_forecolor = console_forecolor;
+    font.cf_backcolor = console_backcolor;
+
+    video_mem[y * CONSOLE_WIDTH + x] = font; // Copy to screen
 }
 
 void kputchar(char ch)
 {
-    struct console_font *addr = next_console_char_addr();
     switch (ch) {
-       case '\r':
-       break;
+        case '\n':
+            print_spaces(pos_y, pos_x, CONSOLE_WIDTH - pos_x);
+            pos_y++;
+            pos_x = 0;
+        return;
 
-       case '\n':
-            print_spaces(CONSOLE_WIDTH - pos_x);
-       break;
-
-       case '\t':
-            print_spaces(4);
-       break;
-
-       default:
-            addr->cf_char = ch;
-       break;
+        case '\t':
+            print_spaces(pos_y, pos_x, 4);
+            pos_x += 4;
+        return;
     }
+
+    kpos_putchar(ch, pos_x, pos_y);
+    if (pos_x+1 >= CONSOLE_WIDTH) { // At the end of the line
+        pos_x = 0;
+        pos_y++;
+        if (pos_y+1 >= CONSOLE_HEIGHT) // At the end of the screen
+            scroll_up_console(1);
+
+    } else {
+        pos_x++;
+    }
+}
+
+size_t kpos_print(const char *line, int x, int y)
+{
+    size_t size = strlen(line);
+    unsigned int i;              // shut up GCC
+    for (i = 0; i < size; i++) {
+        kpos_putchar(line[i], x+i, y);
+    }
+    return size;
 }
 
 size_t kprint(const char *line) /* No formatting */
@@ -81,43 +90,45 @@ size_t kprint(const char *line) /* No formatting */
     return size;
 }
 
-/* Every function which somehow modify the videomem should call this function, 
- * becase we must be able to count the actual X and Y coordinates to scroll
- * if necessary.
- *
- * RET: It gives back the next address of the 'font'.
-*/
-struct console_font *next_console_char_addr()
-{
-    struct console_font *addr;
-    if (pos_x >= (CONSOLE_WIDTH-1)) { // At the end of the line
-        pos_x = 0;
-        pos_y++;
-        if (pos_y + 1 >= CONSOLE_HEIGHT) // At the end of the screen
-            scroll_console();
-
-    } else {
-        pos_x++;
-    }
-    addr = CURRENT_POS_ADDR;
-    addr->cf_forecolor = console_forecolor;
-    addr->cf_backcolor = console_backcolor;
-    return addr;
-}
-
-void scroll_console()
+void scroll_up_console(int count)
 {
     int i;
-    for (i = 0; i < CONSOLE_HEIGHT * CONSOLE_WIDTH; i++) {
-        video_mem[i] = video_mem[CONSOLE_WIDTH + i];
+    while (count--) {
+        for (i = 0; i < (CONSOLE_HEIGHT-1) * CONSOLE_WIDTH; i++) {
+            video_mem[i] = video_mem[CONSOLE_WIDTH + i];
+        }
     }
     pos_y = CONSOLE_HEIGHT - 1;
-    print_spaces(CONSOLE_WIDTH-1);
     pos_x = 0; 
+    print_spaces(pos_x, pos_y, CONSOLE_WIDTH-1);
 }
 
+void scroll_down_console(int count)
+{
+    int i;
+    while (count--) {
+        for (i = (CONSOLE_HEIGHT-1) * CONSOLE_WIDTH; i > 0; i++) {
+            video_mem[CONSOLE_WIDTH - i] = video_mem[i];
+        }
+    }
+    pos_y = 0;
+    pos_x = 0; 
+    print_spaces(pos_x, pos_y, CONSOLE_WIDTH-1);
+}
 
-void move_cursor(int x, int y)
+void print_spaces(int x, int y, int count)
+{
+    while (count--) {
+        if (x >= CONSOLE_WIDTH) {
+            x = 0;
+            y++;
+        }
+        kpos_putchar(' ', x, y);
+        x++;
+    }
+}
+
+void move_console_cursor(int x, int y)
 {
     unsigned temp;
 
