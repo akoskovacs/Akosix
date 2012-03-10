@@ -5,7 +5,15 @@
 
 #define __inline __attribute__((__inline__))
 #define __unused __attribute__((unused))
+#define __used __attribute__((used))
 #define __packed __attribute__((packed))
+
+#define __init __section(.init.text)
+#define __initdata __section(.init.data)
+#define __exit __section(.exit.text)
+#define __exitdata __section(.exit.data)
+#define __section(name) __attribute((__section__(#name)))
+typedef int (*initcall_t)(void);
 
 #define va_start(v,l)	__builtin_va_start(v,l)
 #define va_end(v)	__builtin_va_end(v)
