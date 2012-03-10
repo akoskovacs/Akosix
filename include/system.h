@@ -87,15 +87,22 @@ static inline
 uint32_t read_cr0(void)
 {
     uint32_t value;
-    __asm__ __volatile__("mov %%cr0, %0" : "=r"(value));
+    __asm__ __volatile__("movl %%cr0, %0" : "=r"(value));
     return value;
+}
+
+static inline
+void write_cr0(uint32_t value)
+{
+    __asm__ __volatile("movl %0, %%cr0" : /* No output */
+                                        : "r"(value));
 }
 
 static inline
 uint32_t read_cr1(void)
 {
     uint32_t value;
-    __asm__ __volatile__("mov %%cr1, %0" : "=r"(value));
+    __asm__ __volatile__("movl %%cr1, %0" : "=r"(value));
     return value;
 }
 
@@ -103,7 +110,7 @@ static inline
 uint32_t read_cr2(void)
 {
     uint32_t value;
-    __asm__ __volatile__("mov %%cr2, %0" : "=r"(value));
+    __asm__ __volatile__("movl %%cr2, %0" : "=r"(value));
     return value;
 }
 
@@ -111,8 +118,15 @@ static inline
 uint32_t read_cr3(void)
 {
     uint32_t value;
-    __asm__ __volatile__("mov %%cr3, %0" : "=r"(value));
+    __asm__ __volatile__("movl %%cr3, %0" : "=r"(value));
     return value;
+}
+
+static inline
+void write_cr3(uint32_t value)
+{
+    __asm__ __volatile("movl %0, %%cr3" : /* No output */
+                                        : "r"(value));
 }
 
 #endif // SYSTEM_H
