@@ -7,8 +7,7 @@ INCLUDES = -I include -I lib/include
 OPTS = -Wall -Wextra -Werror -nostdlib -fno-builtin -nostartfiles -nodefaultlibs -nostdinc
 KERNEL = kmain.c lib/string.c console.c lib/kprintf.c
 
-all: link
-	$(CAT) stage1 stage2 kernel.bin > floppy.img
+all: loader kernel link
 
 loader:
 	as boot/boot.S -o boot.o
