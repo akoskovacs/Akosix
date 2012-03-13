@@ -7,6 +7,7 @@
 #define __unused __attribute__((unused))
 #define __used __attribute__((used))
 #define __packed __attribute__((packed))
+#define __align(A) __attribute__((aligned(A)))
 
 #define __init __section(.init.text)
 #define __initdata __section(.init.data)
