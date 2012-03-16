@@ -1,22 +1,31 @@
-# TODO: Urrggh, must be replaced in the near future
-CC = gcc
+CC  = gcc
+AS  = gcc
 CAT = cat
-LD = ld
-RM = rm
-INCLUDES = -I include -I lib/include
-OPTS = -Wall -Wextra -Werror -nostdlib -fno-builtin -nostartfiles -nodefaultlibs -nostdinc
-KERNEL = kmain.c lib/string.c console.c lib/kprintf.c
+LD  = ld
+RM  = rm
 
-all: loader kernel link
+CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ggdb
+ASFLAGS := -Wall -Wextra -Werror 
+LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -s -T linker.ld
+INCLUDES := -I include -I lib/include
+TARGET := akx_kernel
+MAPFILE := akx_kernel.map
 
-loader:
-	as boot/boot.S -o boot.o
+OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o memory.o boot/pgsetup.o boot/boot.o
+all: $(TARGET)
 
-kernel: 
-	$(CC) -c $(KERNEL) $(OPTS) $(INCLUDES) -ggdb
+%.o : %.c
+	@echo "CC $*.c"
+	@$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
 
-link: loader kernel lib
-	$(LD) -T linker.ld -o kernel.bin boot.o kmain.o string.o console.o kprintf.o
+%.o : %.S
+	@echo "AS $*.S"
+	@$(AS) $(ASFLAGS) -c -o $*.o $*.S
+	
+$(TARGET): $(OBJECTS)
+	@echo "LINK $@"
+	@$(LD) $(LDFLAGS) -o $@ -Map $(MAPFILE) $^
 
+.PHONY: clean
 clean:
-	$(RM) *.o kernel.bin floppy.img 
+	$(RM) -rf $(OBJECTS) $(TARGET) $(MAPFILE)
