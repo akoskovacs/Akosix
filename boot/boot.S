@@ -1,5 +1,5 @@
 .global loader
-
+.section .setup
 .set ALIGN,    0x001
 .set MEMINFO,  0x002
 .set FLAGS,    ALIGN | MEMINFO
@@ -18,7 +18,7 @@ loader:
     mov   $(stack + STACKSIZE), %esp
     push  %eax                          # Multiboot table
     push  %ebx
-
+    call setup_paging
     call kmain
 
 hang:

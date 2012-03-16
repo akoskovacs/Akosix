@@ -25,6 +25,7 @@ typedef int (*initcall_t)(void);
 
 /* Setup section */
 #define __setup __section(".setup")
+#define __setup_data __section(".setup.data")
 
 /* Macros for va_list */
 #define va_start(v,l)	__builtin_va_start(v,l)
