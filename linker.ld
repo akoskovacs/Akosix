@@ -5,14 +5,22 @@ ENTRY (loader)
 SECTIONS
 {
     . = 0x00100000;
+    .setup ALIGN (0x1000) :
+    {
+        __start_setup = .;
+        *(.setup)
+        *(.setup.data)
+        __end_setup = .;
+    }
+
+    /* Higher half */
+    . += 0xc0000000;
     .text ALIGN (0x1000) :
     {
-    __start_cs_kernel = .;
         *(.text)
     __start_cs_init = .;
         *(.init.text)
     __end_cs_init = .;
-    __end_cs_kernel = .;
     }
 
     .rodata ALIGN (0x1000) :
