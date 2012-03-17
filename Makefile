@@ -5,8 +5,8 @@ LD  = ld
 RM  = rm
 
 CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ggdb
-ASFLAGS := -Wall -Wextra -Werror 
-LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -s -T linker.ld
+ASFLAGS := -Wall -Wextra -Werror -ggdb
+LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
 INCLUDES := -I include -I lib/include
 TARGET := akx_kernel
 MAPFILE := akx_kernel.map
@@ -24,7 +24,7 @@ all: $(TARGET)
 	
 $(TARGET): $(OBJECTS)
 	@echo "LINK $@"
-	@$(LD) $(LDFLAGS) -o $@ -Map $(MAPFILE) $^
+	@$(LD) $(LDFLAGS) -o $@ -ggdb $^ -Map $(MAPFILE)
 
 .PHONY: clean
 clean:
