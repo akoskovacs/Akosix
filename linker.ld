@@ -1,21 +1,25 @@
 OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
 OUTPUT_ARCH(i386)
 ENTRY (loader)
+hhalf = 0xc0000000;
+page_size = 4096;
 
 SECTIONS
 {
     . = 0x00100000;
-    .setup ALIGN (0x1000) :
+    .setup :
     {
-        __start_setup = .;
+    __start_setup = .;
         *(.setup)
         *(.setup.data)
-        __end_setup = .;
+        boot/boot.o(.bss)
+        boot/boot.o(COMMON)
+    __end_setup = .;
     }
 
     /* Higher half */
     . += 0xc0000000;
-    .text ALIGN (0x1000) :
+    .text : AT(ADDR(.text) - hhalf) 
     {
         *(.text)
     __start_cs_init = .;
@@ -23,18 +27,18 @@ SECTIONS
     __end_cs_init = .;
     }
 
-    .rodata ALIGN (0x1000) :
+    .rodata ALIGN(page_size) : AT(ADDR(.rodata) - hhalf)
     {
     __start_data_kernel = .;
         *(.rodata*)
     }
 
-    .data ALIGN (0x1000) :
+    .data ALIGN(page_size) : AT(ADDR(.data) - hhalf)
     {
         *(.data)
     }
 
-    .bss :
+    .bss ALIGN(page_size) : AT(ADDR(.bss) - hhalf)
     {
         sbss = .;
         *(COMMON)
