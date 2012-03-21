@@ -3,7 +3,6 @@
 
 #include <types.h>
 #include <basic.h>
-#define PAGE_SIZE 4096
 
 struct page_entry {
     uint32_t present  : 1;
