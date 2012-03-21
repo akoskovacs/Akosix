@@ -3,6 +3,9 @@
 
 typedef unsigned int size_t;
 typedef unsigned long off_t;
+typedef unsigned int paddr_t;
+typedef void * vaddr_t;
+
 typedef unsigned char uint8_t;
 typedef unsigned short int uint16_t;
 typedef unsigned int uint32_t; 

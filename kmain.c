@@ -4,6 +4,7 @@
 #include <string.h>
 #include <multiboot.h>
 #include <page.h>
+
 extern char __end_data_kernel;
 
 void kmain(struct multiboot_info *mbi, unsigned int magic)
@@ -18,6 +19,7 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    init_console();
    kprintf("Booting Akosix...\nAt kmain() %p\n", &kmain);
    kprintf("Memory present %dKB.\n", mem);
+   kprintf("Paging enabled!\n");
    kprintf("command line: %s\n", (const char *)mbi->cmdline);
    kprintf("End of kernel %p\n", (void*)&__end_data_kernel);
 }
