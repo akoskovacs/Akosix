@@ -12,11 +12,11 @@ void setup_paging(void)
         page_directory[i] = 0;
         page_table[i] = 0;
         /* Map the first 4MB and set the appropriate flags */
-        page_table[i] = (i * PAGE_SIZE) | 0x3;
+        page_table[i] = (i * PAGE_SIZE) | PT_RW | PT_PRESENT;
     }
     
-    page_directory[0] = (uint32_t)page_table | 0x3;
-    page_directory[768] = (uint32_t)page_table | 0x3;
+    page_directory[0] = (uint32_t)page_table | PD_RW | PD_PRESENT;
+    page_directory[768] = page_directory[0];
     __asm__ __volatile__("movl %0, %%cr3\n"
                          "movl %%cr0, %%eax\n"
                          "orl $0x80000000, %%eax\n"
