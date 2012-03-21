@@ -8,7 +8,9 @@
 
 #define CONSOLE_WIDTH  80
 #define CONSOLE_HEIGHT 25
-#define VIDEORAM (struct console_font *)0xb8000 // Standard color screen
+
+// Standard color screen in higher-half
+#define VIDEORAM (struct console_font *)VADDR(0xb8000)
 
 static struct console_font *video_mem = (struct console_font *)VIDEORAM;
 static console_color_t console_forecolor = COLOR_WHITE;
