@@ -52,31 +52,6 @@ static inline bool is_irq_on()
     return f & (1<<9);
 }
 
-#if 0
-static inline
-void lidt(void *base, size_t size)
-{
-    size_t i[2];
-    i[0] = size << 16; 
-    i[1] = (unsigned int)base;
-    __asm__("lidt (%0)" : : "p"(((char *) i)+2));
-}
-#endif
-
-static inline
-void lidt(void *base, size_t size)
-{
-    struct {
-        uint16_t length;
-        uint64_t base;
-    } __packed IDTR;
-    IDTR.length = size;
-    IDTR.base = (uint64_t)base;
-    __asm__("lidt (%0)" 
-    :
-    : "p"(&IDTR));
-}
-
 static inline
 void rdtsc(uint32_t *upper, uint32_t *lower)
 {
