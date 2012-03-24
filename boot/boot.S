@@ -14,17 +14,28 @@
 .long FLAGS
 .long CHECKSUM
 
+.extern setup_pd
+
 loader:
     mov   $(lower_stack + STACKSIZE/16), %esp
     pushl %eax
     pushl %ebx
-    call  setup_paging
+    call  enable_paging
     popl  %ebx
     popl  %eax
     movl  $(higher_stack + STACKSIZE), %esp
     pushl %eax
     pushl %ebx
     call  kmain
+    jmp   hang
+
+enable_paging:
+    call  setup_pd
+    movl  %eax, %cr3
+    movl  %cr0, %eax
+    orl   $0x80000000, %eax
+    movl  %eax, %cr0
+ret
 
 hang:
     hlt
