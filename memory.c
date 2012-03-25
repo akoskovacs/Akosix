@@ -1,46 +1,23 @@
 #include <types.h>
+#include <multiboot.h>
 #include <memory.h>
 
-uint8_t higher_stack[16 * 1024];
 uint32_t placement_address = 0;
 extern char __end_data_kernel[];
-
-void init_memory(void)
+#if 0
+void init_memory(struct multiboot_info *mbi)
 {
-    if (placement_address == 0) {
-        placement_address = (uint32_t)&__end_data_kernel;
-    }
+   unsigned int i = 0;
+   struct multiboot_mmap_entry *mmap;
+   mmap = (struct multiboot_mmap_entry *)mbi->mmap_addr;
+   while (i < mbi->mmap_length) {
+       mmap = (struct multiboot_mmap_entry *)mbi->mmap_addr;
+       kprintf("\nsize %d, addr %x, length %d [%savailable]\n"
+       , mmap->size, mmap->addr
+       , (mmap->type == MB_MEMORY_AVAILABLE) ? "" : "not "); 
+       i += sizeof(struct multiboot_mmap_entry);
+   }
 }
+#endif
 
-uint32_t kmalloc_internal(size_t sz, int align, uint32_t *phys)
-{
-    if (placement_address == 0) {
-        placement_address = (uint32_t)&__end_data_kernel;
-    }
-    if (align == 1 && (placement_address & 0xFFFFF000)) {
-        // Align it.
-        placement_address &= 0xFFFFF000;
-        placement_address += 0x1000;
-    }
-    if (phys) {
-        *phys = placement_address;
-    }
-    uint32_t tmp = placement_address;
-    placement_address += sz;
-    return tmp;
-}
 
-void *kmalloc(size_t size)
-{
-    return (void *)kmalloc_internal(size, 0, 0);
-}
-
-void *kmalloc_align(size_t size)
-{
-    return (void *)kmalloc_internal(size, 1, 0);
-}
-
-void *kmalloc_phys_align(size_t size, uint32_t *phys)
-{
-    return (void *)kmalloc_internal(size, 1, phys);
-}
