@@ -1,6 +1,11 @@
 #include <basic.h>
 #include <string.h>
 
+/* Some of these functions may borrowed from Linux */
+
+/* Not really a string function :-D */
+#define abs(n) (((n) < 0) ? -(n) : (n))
+
 char *strcpy(char *dest, const char *src)
 {
     char *ret = dest;
@@ -178,37 +183,85 @@ void *memmove(void *dest, const void *src, size_t count)
     return dest;
 }
 
-char* itoa(int value, char *result, int base)
+char hexdigit(int n)
 {
-    // check that the base if valid
-    if (base < 2 || base > 36) {
-        *result = '\0';
-        return result;
-    }
+	char x;
+	switch(n)
+	{
+		case 10:
+			x = 'A';
+			break;
+		case 11:
+			x = 'B';
+			break;
+		case 12:
+			x = 'C';
+			break;
+		case 13:
+			x = 'D';
+			break;
+		case 14:
+			x = 'E';
+			break;
+		case 15:
+			x = 'F';
+			break;
+		default:
+			x = n + 0x30;
+			break;
+	}
+	return x;
+}
 
-    char* ptr = result, *ptr1 = result, tmp_char;
-    int tmp_value;
+void itoa(int num, int base, char *buffer)
+{
+	unsigned int r = 0;
+	int i = 0;
+	char tmp[32];
+	if(num < 0)
+		*buffer++ = '-';
+	num = abs(num);
 
-    do {
-        tmp_value = value;
-        value /= base;
-        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
-    } while (value);
+	if(num < base){
+		*buffer++ = hexdigit(num);
+		*buffer = '\0';
+		return;
+	}
 
-    /* To be cool, we need the 0x at the start */
-    if (base == 16) {
-        *ptr++ = 'x';
-        *ptr++ = '0';
-    }
-    
-    // Apply negative sign
-    if (tmp_value < 0)
-        *ptr++ = '-';
-    *ptr-- = '\0';
-    while(ptr1 < ptr) {
-        tmp_char = *ptr;
-        *ptr--= *ptr1;
-        *ptr1++ = tmp_char;
-    }
-    return result;
+	if(num >= base)
+		while(num)
+		{
+			r = num % base;
+			num /= base;
+			tmp[i++] = hexdigit(r);	
+		}
+	i--;
+	for( ; i>=0 ; i--)
+		*buffer++ = tmp[i];
+	*buffer = '\0';
+}
+
+void uitoa(unsigned int num, unsigned int base, char *buffer)
+{
+	unsigned int r=0;
+	int i=0;
+	char tmp[32];
+
+	if(num < base){
+		*buffer++ = hexdigit(num);
+		*buffer = '\0';
+		return;
+	}
+
+	if(num >= base)
+		while(num)
+		{
+			r = num % base;
+			num /= base;
+			tmp[i++] = hexdigit(r);	
+		}
+	i--;
+	for( ; i>=0 ; i--)
+		*buffer++ = tmp[i];
+	*buffer = '\0';
 }
