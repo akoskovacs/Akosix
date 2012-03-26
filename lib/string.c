@@ -9,9 +9,6 @@
 char *strcpy(char *dest, const char *src)
 {
     char *ret = dest;
-    if (src == NULL || dest == NULL)
-        return NULL;
-
     while ((*dest++ = *src++) != '\0')
         ;
 
@@ -21,9 +18,6 @@ char *strcpy(char *dest, const char *src)
 size_t strlen(const char *str)
 {
     size_t str_size = 0;
-    if (str == NULL)
-        return 0;
-
     while ((*str++))
         str_size++;
 
