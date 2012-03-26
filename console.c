@@ -8,63 +8,85 @@
 
 #define CONSOLE_WIDTH  80
 #define CONSOLE_HEIGHT 25
+#define CONSOLE_LAST_COLUMN    CONSOLE_WIDTH - 1
+#define CONSOLE_LAST_ROW       CONSOLE_HEIGHT - 1
+#define TABSIZE        4
 
 // Standard color screen in higher-half
-#define VIDEORAM (struct console_font *)VADDR(0xb8000)
-
-static struct console_font *video_mem = (struct console_font *)VIDEORAM;
-static console_color_t console_forecolor = COLOR_WHITE;
-static console_color_t console_backcolor = COLOR_BLACK;
-static int pos_x = 0, pos_y = 0;
+#define VIDEORAM (console_font_t *)VADDR(0xb8000)
 static void print_spaces(int, int, int);
+static console_font_t *video_mem = VIDEORAM;
+static console_attr_t console_attributes = 0;
+static int pos_x = 0;
+static int pos_y = 0;
 
-void set_forecolor(console_color_t color) { console_forecolor = color; }
-void set_backcolor(console_color_t color) { console_backcolor = color; }
+void set_console_attributes(console_attr_t attr)
+{
+    console_attributes = attr;
+}
+
+console_attr_t get_console_attributes(void)
+{
+    return console_attributes;
+}
 
 void init_console()
 {
+    if (console_attributes == 0)
+        console_attributes = (FG_COLOR_BLUE | LIGHT | BG_COLOR_WHITE);
     clear_console();
 }
 
 void clear_console()
 {
-    print_spaces(0, 0, CONSOLE_HEIGHT*CONSOLE_WIDTH);
+    print_spaces(0, 0, CONSOLE_WIDTH * CONSOLE_HEIGHT);
 }
 
-void kpos_putchar(char ch, int x, int y)
+void kpos_putchar(int x, int y, char ch)
 {
-    struct console_font font;
+    console_font_t font = 0;
 
-    if (x >= CONSOLE_WIDTH || y >= CONSOLE_HEIGHT)
+    if (x > CONSOLE_LAST_COLUMN || y > CONSOLE_LAST_ROW)
         return;
+    
+    switch (ch) {
+        case '\n': case '\r':
+        return;
+        case '\t':
+            print_spaces(x, y, TABSIZE);
+        return;
+    }
 
-    font.cf_char = ch;
-    font.cf_forecolor = console_forecolor;
-    font.cf_backcolor = console_backcolor;
-
+    font |= ch;
+    font |= (console_attributes << 8);
     video_mem[y * CONSOLE_WIDTH + x] = font; // Copy to screen
 }
 
 void kputchar(char ch)
 {
+    int i;
+    int pos;
     switch (ch) {
         case '\n':
-            print_spaces(pos_y, pos_x, CONSOLE_WIDTH - pos_x);
-            pos_y++;
-            pos_x = 0;
+            pos = CONSOLE_WIDTH - pos_x + 1;
+            for (i = 0 ; i < pos; i++) {
+                kputchar(' ');
+            }
         return;
 
         case '\t':
-            print_spaces(pos_y, pos_x, 4);
-            pos_x += 4;
+            for (i = 0 ; i < TABSIZE; i++) {
+                kputchar(' ');
+            }
         return;
     }
+    
 
-    kpos_putchar(ch, pos_x, pos_y);
-    if (pos_x+1 >= CONSOLE_WIDTH) { // At the end of the line
+    kpos_putchar(pos_x, pos_y, ch);
+    if (pos_x > CONSOLE_LAST_COLUMN) { // At the end of the line
         pos_x = 0;
         pos_y++;
-        if (pos_y+1 >= CONSOLE_HEIGHT) // At the end of the screen
+        if (pos_y > CONSOLE_LAST_ROW) // At the end of the screen
             scroll_up_console(1);
 
     } else {
@@ -72,12 +94,12 @@ void kputchar(char ch)
     }
 }
 
-size_t kpos_print(const char *line, int x, int y)
+size_t kpos_print(int x, int y, const char *line)
 {
     size_t size = strlen(line);
     unsigned int i;              // shut up GCC
     for (i = 0; i < size; i++) {
-        kpos_putchar(line[i], x+i, y);
+        kpos_putchar(x+i, y, line[i]);
     }
     return size;
 }
@@ -96,37 +118,38 @@ void scroll_up_console(int count)
 {
     int i;
     while (count--) {
-        for (i = 0; i < (CONSOLE_HEIGHT-1) * CONSOLE_WIDTH; i++) {
+        for (i = 0; i < CONSOLE_HEIGHT * CONSOLE_WIDTH; i++) {
             video_mem[i] = video_mem[CONSOLE_WIDTH + i];
         }
     }
-    pos_y = CONSOLE_HEIGHT - 1;
+    pos_y = CONSOLE_LAST_ROW;
     pos_x = 0; 
-    print_spaces(pos_x, pos_y, CONSOLE_WIDTH-1);
+    print_spaces(pos_x, pos_y, CONSOLE_WIDTH);
 }
 
 void scroll_down_console(int count)
 {
     int i;
     while (count--) {
-        for (i = (CONSOLE_HEIGHT-1) * CONSOLE_WIDTH; i > 0; i++) {
+        for (i = CONSOLE_HEIGHT * CONSOLE_WIDTH; i > 0; i++) {
             video_mem[CONSOLE_WIDTH - i] = video_mem[i];
         }
     }
     pos_y = 0;
     pos_x = 0; 
-    print_spaces(pos_x, pos_y, CONSOLE_WIDTH-1);
+    print_spaces(pos_x, pos_y, CONSOLE_WIDTH);
 }
 
 void print_spaces(int x, int y, int count)
 {
-    while (count--) {
-        if (x >= CONSOLE_WIDTH) {
+    while (count) {
+        if (x > CONSOLE_LAST_COLUMN) {
             x = 0;
             y++;
         }
-        kpos_putchar(' ', x, y);
+        kpos_putchar(x, y, ' ');
         x++;
+        count--;
     }
 }
 
