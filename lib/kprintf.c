@@ -19,6 +19,8 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
            switch (*fmt) {
                case 's':
                    tmp = va_arg(ap, char *);
+                   if (tmp == NULL)
+                       tmp = "(null)";
                    nsize = strlen(tmp);
                    strncpy(dest+asize, tmp, size-asize);
                    asize += nsize;
@@ -44,7 +46,7 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
                     else 
                         unum = (unsigned int)va_arg(ap, void *);
 
-                    strncpy(dest-asize, "0x", size-asize);
+                    strncpy(dest+asize, "0x", size-asize);
                     asize += 2;
                     uitoa(unum, 16, buffer);
                     nsize = strlen(buffer);
