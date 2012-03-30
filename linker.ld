@@ -21,10 +21,10 @@ SECTIONS
     . += 0xc0000000;
     .text : AT(ADDR(.text) - hhalf) 
     {
-        *(.text)
     __start_cs_init = .;
         *(.init.text)
     __end_cs_init = .;
+        *(.text)
     }
 
     .rodata ALIGN(page_size) : AT(ADDR(.rodata) - hhalf)
