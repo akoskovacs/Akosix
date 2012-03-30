@@ -2,7 +2,10 @@
 #define MEMORY_H
 
 #include <types.h>
-void init_memory(void);
+
+struct multiboot_info;
+
+void init_memory(struct multiboot_info *);
 void *kmalloc(size_t);
 void *kmalloc_align(size_t);
 void *kmalloc_phys(size_t, uint32_t *);
