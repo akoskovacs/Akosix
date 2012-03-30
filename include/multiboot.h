@@ -33,7 +33,14 @@ struct __packed multiboot_mmap_entry {
     uint32_t type;
 };
 
-struct multiboot_info {
+struct __packed multiboot_module {
+    uint32_t mod_start;
+    uint32_t mod_end;
+    uint32_t cmdline;
+    uint32_t pad;
+};
+
+struct __packed multiboot_info {
     uint32_t flags;
     uint32_t mem_lower;
     uint32_t mem_upper;
@@ -50,11 +57,11 @@ struct multiboot_info {
     uint32_t boot_loader_name;
     uint32_t apm_table;
     uint32_t vbe_control_info;
-    uint32_t vbe_mode_info;
-    uint32_t vbe_mode;
+    uint16_t vbe_mode_info;
+    uint16_t vbe_mode;
     uint16_t vbe_interface_seg;
     uint16_t vbe_interface_off;
     uint16_t vbe_interface_len;
-} __packed;
+};
 
 #endif // MULTIBOOT_H
