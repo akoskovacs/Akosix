@@ -40,14 +40,16 @@ int vsnprintf(char *dest, size_t size, const char *fmt, va_list ap)
                    asize += nsize;
                break;
 
-               case 'x': case 'p':
+               case 'x': case 'p': case 'X':
                     if (*fmt == 'x')
                         unum = va_arg(ap, unsigned int);
                     else 
                         unum = (unsigned int)va_arg(ap, void *);
 
-                    strncpy(dest+asize, "0x", size-asize);
-                    asize += 2;
+                    if (*fmt != 'X') {
+                        strncpy(dest+asize, "0x", size-asize);
+                        asize += 2;
+                    }
                     uitoa(unum, 16, buffer);
                     nsize = strlen(buffer);
                     strncpy(dest+asize, buffer, size-asize);
