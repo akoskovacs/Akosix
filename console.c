@@ -30,7 +30,7 @@ console_attr_t get_console_attributes(void)
     return console_attributes;
 }
 
-void init_console()
+void console_init()
 {
     if (console_attributes == 0)
         console_attributes = (FG_COLOR_BLUE | LIGHT | BG_COLOR_WHITE);

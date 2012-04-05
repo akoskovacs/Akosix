@@ -5,14 +5,12 @@
 #include <multiboot.h>
 #include <memory.h>
 
-extern char __end_data_kernel;
-
 void kmain(struct multiboot_info *mbi, unsigned int magic)
 {
    unsigned int mem = mbi->mem_upper + mbi->mem_lower;
 
    set_console_attributes(FG_COLOR_WHITE | LIGHT | BG_COLOR_BLUE);
-   init_console();
+   console_init();
 
    if (magic != 0x2BADB002) {
        kprint("Ooops, something went wrong! Terminated!n\n");
@@ -43,5 +41,5 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    if (mbi->flags & MB_INFO_MEM_MAP)
        kprintf("\to Has multiboot memory-map info:\n");
 
-   init_memory(mbi);
+   memory_init(mbi);
 }

@@ -25,7 +25,7 @@ typedef enum {
     FG_COLOR_BLACK   = 0x00,
 } console_attr_t;
 
-void init_console();
+void console_init();
 void clear_console();
 void set_console_attributes(console_attr_t);
 console_attr_t get_console_attributes(void);
