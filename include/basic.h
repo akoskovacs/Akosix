@@ -5,16 +5,20 @@
 
 #define PAGE_SIZE   4096
 #define PAGE_SHIFT  12
-#define PAGE_OFFSET 0xc0000000
+#define PAGE_OFFSET 0xC0000000
 
 // Virtual to physical 
 #define VADDR(x) (vaddr_t)(x + PAGE_OFFSET)
 // Physical to virtual
 #define PADDR(x) (paddr_t)(x - PAGE_OFFSET)
 
+#define PAGE_ALIGN(addr) ((addr) & (~0x0F))
+
 /* Simple bit operations, works on the Nth bit of the value */
 #define SET_BIT(V, N) ((V) |= (1 << (N)))
 #define CLEAR_BIT(V, N) ((V) &= ~(1 << (N)))
+#define IS_BIT_SET(V, N) TEST_BIT(V, N)
+#define IS_BIT_NOT_SET(V, N) (!TEST_BIT(V, N))
 #define TEST_BIT(V, N) ((V) & (1 << (N)))
 
 /* General GCC attributes */
