@@ -5,6 +5,7 @@
 .set ALIGN,    0x001
 .set MEMINFO,  0x002
 .set VBEINFO,  0x004
+.set PAGE_OFFSET, 0xC0000000
 .set FLAGS,    ALIGN | MEMINFO 
 #ifdef ENABLE_VBE
     | VBEINFO
@@ -33,11 +34,12 @@
 
 loader:
     mov   $(kernel_stack + STACKSIZE), %esp
+    addl  $PAGE_OFFSET, %ebx
     pushl %eax
     pushl %ebx
     call  enable_paging
 # Higher-half address of the stack
-    addl  $0xC0000000, %esp 
+    addl  $PAGE_OFFSET, %esp 
     call  kmain
     jmp   hang
 
