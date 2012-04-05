@@ -11,7 +11,7 @@ INCLUDES := -I include -I lib/include
 TARGET := akx_kernel
 MAPFILE := akx_kernel.map
 
-OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o memory.o boot/pgsetup.o boot/boot.o
+OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o memory.o boot/pgsetup.o boot/boot.o pmm.o
 all: $(TARGET)
 
 %.o : %.c
