@@ -15,7 +15,7 @@ MAPFILE := akx_kernel.map
 ISO := akosix.iso 
 DIST := dist/
 
-OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o memory.o boot/pgsetup.o boot/boot.o pmm.o
+OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o
 all: $(TARGET)
 
 %.o : %.c
