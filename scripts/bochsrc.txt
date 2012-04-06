@@ -1,0 +1,7 @@
+megs: 32
+boot: cdrom
+ata0-slave: type=cdrom, path=../akosix.iso, status=inserted
+log: bochsout.txt
+mouse: enabled=0
+clock: sync=realtime
+cpu: reset_on_triple_fault=0
