@@ -16,10 +16,15 @@ void memory_init(struct multiboot_info *);
 void *expand_kheap(size_t size);
 void *contract_kheap(size_t size);
 
-void *kmalloc(size_t);
-void *kmalloc_align(size_t);
-void *kmalloc_phys(size_t, uint32_t *);
-void *kmalloc_phys_align(size_t, uint32_t *);
+typedef enum {
+    M_NORMAL   = 0x000, 
+    M_ALIGNED  = 0x001,
+    M_USER     = 0x002,
+    M_ZEROED   = 0x003
+} malloc_flags_t;
+
+void *kmalloc(size_t, malloc_flags_t);
+void kfree(void *);
 
 vaddr_t kheap_start;
 vaddr_t kheap_end;

@@ -8,6 +8,7 @@
 void kmain(struct multiboot_info *mbi, unsigned int magic)
 {
    unsigned int mem = mbi->mem_upper + mbi->mem_lower;
+   struct multiboot_info *nmbi;
 
    set_console_attributes(FG_COLOR_WHITE | LIGHT | BG_COLOR_BLUE);
    console_init();
@@ -42,4 +43,7 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
        kprintf("\to Has multiboot memory-map info:\n");
 
    memory_init(mbi);
+   nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
+   kprintf("kmalloc() test (must be 0) %d", nmbi->mem_upper);
+   kfree(nmbi);
 }
