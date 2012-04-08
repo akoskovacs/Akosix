@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Akosix OS by akoskovacs</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Akosix OS</h1>
+        <h2>A hobby x86 operating system</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/akoskovacs/Akosix/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/akoskovacs/Akosix/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/akoskovacs/Akosix" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h3>Welcome to Akosix</h3>
+
+<p>Akosix is a free and open-source hobby operating system for the x86 computers (for Intel, AMD, VIA 32 processor).</p>
+
+<h3>Gathering and building Akosix</h3>
+
+<pre><code>$ sudo apt-get install git git-core build-essential xorriso qemu # Qemu is optional
+$ git clone git://github.com/akoskovacs/Akosix.git # Download the repo
+$ cd Akosix
+$ make        # Build
+$ make iso    # Create .iso [optional]
+$ make qemu   # Test in Qemu
+</code></pre>
+
+<h3>Features</h3>
+
+<ul>
+<li>Console driver</li>
+<li>Partial virtual memory management with paging</li>
+<li>Multiboot compatibility</li>
+</ul><h3>Goals</h3>
+
+<ul>
+<li><strong>Be usable</strong></li>
+<li>Some user-space application</li>
+<li>Minimal Linux binary compatibility (this will be the default for Akosix apps)</li>
+<li>Minimal MS-DOS compatibility</li>
+<li>Simple package management system</li>
+<li>Some drivers
+
+<ul>
+<li>Filesystems
+
+<ul>
+<li>Iso (cd9660)</li>
+<li>Fat32 </li>
+<li>Ext2 or something similar</li>
+</ul>
+</li>
+<li>Networking
+
+<ul>
+<li>Small TCP/IP stack</li>
+<li>3com or Realtek ethernet</li>
+</ul>
+</li>
+<li>PCI bus</li>
+<li>ATA disk and cdrom</li>
+</ul>
+</li>
+</ul>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
