@@ -16,6 +16,7 @@ struct kmem_block {
     struct kmem_block *kb_next;
 };
 
+struct kmem_block *first;
 struct kmem_block *last;
 struct kmem_block *last_freed;
 
@@ -76,8 +77,9 @@ void *kmalloc(size_t size, malloc_flags_t flags)
 {
    void *ptr = NULL;
    struct kmem_block *malloc = NULL;
+
    if (size == 0)
-       return NULL;
+       return expand_kheap(0);
 
    if (flags & M_NORMAL) {
        if (last_freed != NULL && last_freed->kb_size == size
@@ -93,19 +95,35 @@ void *kmalloc(size_t size, malloc_flags_t flags)
            ptr += sizeof(struct kmem_block);
        }
    } else if (flags & M_ALIGNED) {
-       /* Todo */
+       void *kbrk = expand_kheap(0);
+       void *aligned_ptr = PAGE_ALIGN(kbrk) + PAGE_SIZE;
+       if ((unsigned)(aligned_ptr - kbrk) > (sizeof(struct kmem_block)*2)) {
+           /* We need a free block to cover the gap between the last allocated
+            * area and the new aligned area. It must have enough room to con-
+            * tain it's own kmem_block and the new aligned kmem_block. */
+           kfree(kmalloc(aligned_ptr-kbrk-(sizeof(struct kmem_block)*2), M_NORMAL));
+       } else { /* Too small to create a free gap */
+           /* TODO */
+       }
+       malloc = (struct kmem_block *)
+                expand_kheap(sizeof(struct kmem_block) + size);
+       ptr = (void *)malloc + sizeof(struct kmem_block);
    }
 
    malloc->kb_size = size;
    malloc->kb_prev = last;
    malloc->kb_magic = KMEM_BLOCK_MAGIC;
    malloc->kb_flags = KMEM_BLOCK_USED;
-   if (last != NULL)
+   if (last != NULL) {
+       if (last->kb_magic != KMEM_BLOCK_MAGIC) {
+           kprintf("Panic! Kernel heap corrupted at: %p\n", last);
+           return NULL;
+       }
        last->kb_next = malloc;
-
-   if (last->kb_magic != KMEM_BLOCK_MAGIC) {
-       kprintf("Panic! Kernel heap corrupted at: %p\n", last);
-       return NULL;
+   }
+   if (first == NULL) {
+       first = malloc;
+       last = malloc;
    }
 
    if (flags & M_ZEROED) {
@@ -150,3 +168,24 @@ void kfree(void *ptr)
     malloc->kb_flags |= KMEM_BLOCK_FREE;
     last_freed = malloc;
 }
+
+#if defined DEBUG && defined DEBUG_MALLOC
+void dump_kmallocs(void)
+{
+    struct kmem_block *tmp = first;
+    kprintf("-------- DUMPING ALLOCATIONS --------\n");
+    if (first == NULL) {
+        kprintf("No allocations, yet.\n");
+    } else {
+        while (tmp->kb_next != NULL) {
+            kprintf("Allocation size: %d\n"
+                    "Allocation start: %p\n"
+                    "Magic %s\n\n"
+                    , tmp->kb_size, (void *)tmp + sizeof(struct kmem_block)
+                    , (tmp->kb_magic == KMEM_BLOCK_MAGIC) ? "correct" : "uncorrect");
+            tmp = tmp->kb_next;
+        }
+    }
+    kprintf("---- END OF DUMPING ALLOCATIONS -----\n");
+}
+#endif /* DEBUG && DEBUG_MALLOC */
