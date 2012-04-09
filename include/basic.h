@@ -12,7 +12,7 @@
 // Physical to virtual
 #define PADDR(x) (paddr_t)(x - PAGE_OFFSET)
 
-#define PAGE_ALIGN(addr) ((addr) & (~0x0F))
+#define PAGE_ALIGN(addr) (vaddr_t)(((uint32_t)addr) & (~0x0F))
 
 /* Simple bit operations, works on the Nth bit of the value */
 #define SET_BIT(V, N) ((V) |= (1 << (N)))
