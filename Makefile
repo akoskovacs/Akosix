@@ -6,8 +6,8 @@ RM  = rm
 SH  = bash
 QEMU = qemu
 
-CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb
-ASFLAGS := -Wall -Wextra -Werror -ggdb
+CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb -m32
+ASFLAGS := -Wall -Wextra -Werror -ggdb -m32
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
 INCLUDES := -I include -I lib/include
 TARGET := akx_kernel

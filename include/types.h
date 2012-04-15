@@ -1,10 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#ifdef __x86_64__
-#error "Sorry, but you cannot compile Akosix in a 64-bit environment, yet. :-("
-#endif
-
 typedef unsigned long size_t;
 typedef unsigned long long off_t;
 typedef unsigned long paddr_t;
