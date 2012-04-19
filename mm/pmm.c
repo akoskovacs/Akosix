@@ -89,7 +89,8 @@ void pmm_alloc_frame(page_t *p)
 
 void pmm_free_frame(page_t *p)
 {
-    pfn_t frame = ADDR_TO_PFN(PAGE_FRAME(*p));
+    /*pfn_t frame = ADDR_TO_PFN(PAGE_FRAME(*p));*/
+    pfn_t frame = *p;
     pmm_clear_frame(frame);
     SET_PAGE_FRAME(*p, 0);
 }

@@ -92,7 +92,7 @@ void *kmalloc(size_t size, malloc_flags_t flags)
        return expand_kheap(0);
    
    if (flags & M_NORMAL) {
-       if ((!STAILQ_EMPTY(&free_mem_areas)) && (size <= biggest_free_size))
+       if (!STAILQ_EMPTY(&free_mem_areas) && size <= biggest_free_size) {
            STAILQ_FOREACH_MUTABLE(tmp, &free_mem_areas, ka_free_entries, mtmp) {
                if (tmp->ka_size >= size) {
                    marea = tmp;
@@ -132,7 +132,7 @@ void *kmalloc(size_t size, malloc_flags_t flags)
        CHECK_KMALLOC_AREA_MAGIC(last_mem_area);
        LIST_INSERT_AFTER(last_mem_area, marea, ka_entries);
    } else {
-           LIST_INSERT_HEAD(&mem_areas, marea, ka_entries);
+       LIST_INSERT_HEAD(&mem_areas, marea, ka_entries);
    }
    last_mem_area = marea;
 
