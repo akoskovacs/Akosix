@@ -37,20 +37,35 @@ char *strncpy(char *dest, const char *src, size_t count)
 	return dest;
 }
 
-int strcmp(const char *f, const char *s)
+int strcmp(const char *cs, const char *ct)
 {
-    while (*f || *s) {
-        if (*f == *s)
-            continue;
-        else if(*f < *s)
-            return -1;
-        else 
-            return 1;
+	unsigned char c1, c2;
 
-        f++;
-        s++;
-    }
-    return 0;
+	while (1) {
+		c1 = *cs++;
+		c2 = *ct++;
+		if (c1 != c2)
+			return c1 < c2 ? -1 : 1;
+		if (!c1)
+			break;
+	}
+	return 0;
+}
+
+int strncmp(const char *cs, const char *ct, size_t count)
+{
+	unsigned char c1, c2;
+
+	while (count) {
+		c1 = *cs++;
+		c2 = *ct++;
+		if (c1 != c2)
+			return c1 < c2 ? -1 : 1;
+		if (!c1)
+			break;
+		count--;
+	}
+	return 0;
 }
 
 char *strcat(char *dest, const char *src)

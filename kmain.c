@@ -4,6 +4,7 @@
 #include <string.h>
 #include <multiboot.h>
 #include <memory.h>
+#include <ksymbol.h>
 
 void kmain(struct multiboot_info *mbi, unsigned int magic)
 {
@@ -44,6 +45,8 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
 
    memory_init(mbi);
    nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
-   kprintf("kmalloc() test (must be 0) %d", nmbi->mem_upper);
-   kfree(nmbi);
+   kprintf("kmalloc() test (must be 0) %d\n", nmbi->mem_upper);
+   void *km = get_symbol("kmalloc");
+   kprintf("kmalloc(): %p\n", km);
+   /*kfree(nmbi);*/
 }

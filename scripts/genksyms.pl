@@ -30,9 +30,10 @@ my $out_end = <<EOE;
 void *get_ksymbol(const char *name, symbol_type_t flags)
 {
     struct ksymbol *sym = sym_table;
-    while (sym->ks_name != NULL && sym->ks_address == 0) {
-        if ((strcmp(name, sym->ks_name) == 0) && (sym->ks_type & flags))
+    while (sym->ks_name != NULL && sym->ks_address != 0) {
+        if ((strcmp(name, sym->ks_name) == 0) && (sym->ks_type & flags)) 
             return (void *)sym->ks_address;
+
         sym++;
     }
     return NULL;
