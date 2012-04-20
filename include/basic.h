@@ -27,6 +27,7 @@
 #define __used __attribute__((used))
 #define __packed __attribute__((packed))
 #define __align(A) __attribute__((aligned(A)))
+#define __weak __attribute__((weak))
 
 /* Section macros for initcalls */
 #define __init __section(".init.text")

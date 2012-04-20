@@ -1,6 +1,7 @@
 #ifndef KSYMBOL_H
 #define KSYMBOL_H
 
+#include <basic.h>
 #include <types.h>
 
 typedef enum {
@@ -17,9 +18,9 @@ struct ksymbol {
     symbol_type_t ks_type;
     const char   *ks_name;
 };
-
-void *get_ksymbol(const char *, symbol_type_t);
+void *get_ksymbol(const char *, symbol_type_t) __weak;
 #define get_kfunction(name) get_ksymbol((name), SYM_CODE)
 #define get_kvar(name) get_ksymbol((name), SYM_VARIABLE)
+#define get_symbol(name) get_ksymbol((name), SYM_ANY)
 
 #endif /* KSYMBOL_H */
