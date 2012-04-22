@@ -14,6 +14,9 @@ my $out_header = <<EOH;
               $TIME
 *****************************************************/
 
+#ifndef CONFIG_OPTIONS
+#define CONFIG_OPTIONS
+
 EOH
 
 open(CONF, '<' . $CONFIG_NAME) or die "You must run the \'make config\'!";
@@ -32,6 +35,6 @@ while (<CONF>) {
         }
     }
 }
-
+print HEADER "\n#endif /* CONFIG_OPTIONS */\n";
 close CONF;
 close HEADER;
