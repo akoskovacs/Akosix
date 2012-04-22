@@ -8,7 +8,7 @@ QEMU = qemu
 PERL = perl
 
 CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb -m32
-ASFLAGS := -Wall -Wextra -Werror -ggdb -m32
+ASFLAGS := -Wall -Wextra -Werror -ggdb -m32 -I .
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
 INCLUDES := -I include -I lib/include -I . 
 TMP_TARGET := .tmp_akosix.bin
@@ -22,18 +22,20 @@ OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 
-all: kconfig $(TARGET)
-	@echo "You can run 'make config' to configure..."
+all: $(TARGET)
 
-kconfig: Kconfig .config
+kconfig: 
+	@export KERNELVERSION=$(VERSION)
 	@make -C build/kconfig/
 
-menuconfig: config
-conf: config
-config:
+menuconfig: .config
+conf: .config
+config: .config
+.config: kconfig
 	@export KERNELVERSION=$(VERSION)
 	@build/kconfig/mconf Kconfig
 	@$(PERL) scripts/genconf.pl
+	@echo "Now, you can simply run 'make' to build Akosix"
 
 %.o : %.c
 	@echo "CC $*.c"
