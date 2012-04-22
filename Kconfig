@@ -1,13 +1,69 @@
 # For a description of the syntax of this configuration file,
 # see http://lxr.linux.no/source/Documentation/kbuild/kconfig-language.txt.
+
 mainmenu "Akosix/$ARCH $KERNELVERSION Configuration"
 config KERNELVERSION
     string
 option env="KERNELVERSION"
 
-menu "Build options"
-    config CONFIG_TEST
-    string "Just a test"
+menu "General settings"
+    config STACK_SIZE
+    int "Kernel stack size (in bytes)"
+    default 8192
     help
-        Testing...
+        The default is 8KB, if you not sure, keep it.
+
+    config EXPERIMENTAL
+    bool "Show experimental options"
+    default y
 endmenu
+
+menu "Display"
+    config ENABLE_CONSOLE
+    bool "Enable console"
+    default y
+
+    config CONSOLE_WIDTH
+    depends on ENABLE_CONSOLE
+    int "Height of the console"
+    default 80
+
+    config CONSOLE_HEIGHT
+    depends on ENABLE_CONSOLE
+    int "Height of the console"
+    default 25
+    
+    config ENABLE_VBE
+    default n
+    bool "Enable VBE mode (EXPERIMENTAL)"
+    depends on EXPERIMENTAL
+    help
+        It's very experimental, don't use it.
+
+    config VBE_HEIGHT
+    depends on ENABLE_VBE
+    int "Height of the display"
+    default 800
+
+    config VBE_WIDTH
+    depends on ENABLE_VBE
+    int "Height of the display"
+    default 600
+
+    config VBE_DEPTH
+    depends on ENABLE_VBE
+    int "Bit depth of the display"
+    default 8
+endmenu
+
+menu "Debugging and hacking"
+    config DEBUG_KMALLOC
+    bool "Debug kmalloc()"
+    default n
+    help
+        Dump the kmalloc linked lists to the console    
+
+endmenu
+
+
+

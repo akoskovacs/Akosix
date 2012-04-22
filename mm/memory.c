@@ -158,7 +158,7 @@ void kfree(void *ptr)
     STAILQ_INSERT_TAIL(&free_mem_areas, marea, ka_free_entries);
 }
 
-#if defined DEBUG && defined DEBUG_MALLOC
+#ifdef CONFIG_DEBUG_KMALLOC
 void dump_kmallocs(void)
 {
     struct kmalloc_area *tmp;
@@ -178,4 +178,6 @@ void dump_kmallocs(void)
     }
     kprintf("---- END OF DUMPING ALLOCATIONS -----\n");
 }
-#endif /* DEBUG && DEBUG_MALLOC */
+#else 
+void dump_kmallocs(void) {}
+#endif /* CONFIG_DEBUG_KMALLOC */

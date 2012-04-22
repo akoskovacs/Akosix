@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <config.h>
+
 typedef unsigned long size_t;
 typedef unsigned long long off_t;
 typedef unsigned long paddr_t;

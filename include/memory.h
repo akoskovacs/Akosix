@@ -5,9 +5,6 @@
 #include <basic.h>
 #include <page.h>
 
-#define DEBUG
-#define DEBUG_MALLOC 
-
 #define ADDR_TO_PFN(n) (PAGE_ALIGN((n)) / PAGE_SIZE)
 #define PFN_TO_ADDR(n) (PAGE_ALIGN((n)) / PAGE_SIZE)
 typedef uint32_t pfn_t;
@@ -45,9 +42,6 @@ pfn_t pmm_first_frames(int);
 void pmm_alloc_frame(page_t *);
 void pmm_free_frame(page_t *);
 
-/* debug */
-#if defined DEBUG && defined DEBUG_MALLOC
 void dump_kmallocs(void);
-#endif
 
 #endif // MEMORY_H

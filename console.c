@@ -5,11 +5,12 @@
 #include <string.h>
 #include <system.h>
 #include <types.h>
+#include <config.h>
 
-#define CONSOLE_WIDTH  80
-#define CONSOLE_HEIGHT 25
-#define CONSOLE_LAST_COLUMN    CONSOLE_WIDTH - 1
-#define CONSOLE_LAST_ROW       CONSOLE_HEIGHT - 1
+#define CONFIG_CONFIG_CONSOLE_WIDTH  80
+#define CONFIG_CONFIG_CONSOLE_HEIGHT 25
+#define CONSOLE_LAST_COLUMN    CONFIG_CONSOLE_WIDTH - 1
+#define CONSOLE_LAST_ROW       CONFIG_CONSOLE_HEIGHT - 1
 #define TABSIZE        4
 
 // Standard color screen in higher-half
@@ -39,7 +40,7 @@ void console_init()
 
 void clear_console()
 {
-    print_spaces(0, 0, CONSOLE_WIDTH * CONSOLE_HEIGHT);
+    print_spaces(0, 0, CONFIG_CONSOLE_WIDTH * CONFIG_CONSOLE_HEIGHT);
 }
 
 void kpos_putchar(int x, int y, char ch)
@@ -59,7 +60,7 @@ void kpos_putchar(int x, int y, char ch)
 
     font |= ch;
     font |= (console_attributes << 8);
-    video_mem[y * CONSOLE_WIDTH + x] = font; // Copy to screen
+    video_mem[y * CONFIG_CONSOLE_WIDTH + x] = font; // Copy to screen
 }
 
 void kputchar(char ch)
@@ -68,7 +69,7 @@ void kputchar(char ch)
     int pos;
     switch (ch) {
         case '\n':
-            pos = CONSOLE_WIDTH - pos_x + 1;
+            pos = CONFIG_CONSOLE_WIDTH - pos_x + 1;
             for (i = 0 ; i < pos; i++) {
                 kputchar(' ');
             }
@@ -118,26 +119,26 @@ void scroll_up_console(int count)
 {
     int i;
     while (count--) {
-        for (i = 0; i < CONSOLE_HEIGHT * CONSOLE_WIDTH; i++) {
-            video_mem[i] = video_mem[CONSOLE_WIDTH + i];
+        for (i = 0; i < CONFIG_CONSOLE_HEIGHT * CONFIG_CONSOLE_WIDTH; i++) {
+            video_mem[i] = video_mem[CONFIG_CONSOLE_WIDTH + i];
         }
     }
     pos_y = CONSOLE_LAST_ROW;
     pos_x = 0; 
-    print_spaces(pos_x, pos_y, CONSOLE_WIDTH);
+    print_spaces(pos_x, pos_y, CONFIG_CONSOLE_WIDTH);
 }
 
 void scroll_down_console(int count)
 {
     int i;
     while (count--) {
-        for (i = CONSOLE_HEIGHT * CONSOLE_WIDTH; i > 0; i++) {
-            video_mem[CONSOLE_WIDTH - i] = video_mem[i];
+        for (i = CONFIG_CONSOLE_HEIGHT * CONFIG_CONSOLE_WIDTH; i > 0; i++) {
+            video_mem[CONFIG_CONSOLE_WIDTH - i] = video_mem[i];
         }
     }
     pos_y = 0;
     pos_x = 0; 
-    print_spaces(pos_x, pos_y, CONSOLE_WIDTH);
+    print_spaces(pos_x, pos_y, CONFIG_CONSOLE_WIDTH);
 }
 
 void print_spaces(int x, int y, int count)
@@ -157,7 +158,7 @@ void move_console_cursor(int x, int y)
 {
     unsigned temp;
 
-    temp = y * CONSOLE_WIDTH + x;
+    temp = y * CONFIG_CONSOLE_WIDTH + x;
 
     outb(0x3D4, 14);
     outb(0x3D5, temp >> 8);
