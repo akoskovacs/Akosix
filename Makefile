@@ -22,7 +22,7 @@ OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 
-all: $(TARGET)
+all: $(TARGET) 
 
 kconfig: 
 	@export KERNELVERSION=$(VERSION)
@@ -59,7 +59,7 @@ qemu: $(TARGET)
 bochs: iso
 	@$(SH) scripts/run_bochs.sh
 
-$(TARGET): $(OBJECTS) $(TMP_TARGET)
+$(TARGET): $(OBJECTS) $(TMP_TARGET) config.h
 	@echo "GENKSYMS $(TMP_TARGET)"
 	@$(PERL) scripts/genksyms.pl $(TMP_TARGET) $(KSYM_SRC)
 	@echo "CC $(KSYM_SRC)"
