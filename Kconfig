@@ -1,0 +1,13 @@
+# For a description of the syntax of this configuration file,
+# see http://lxr.linux.no/source/Documentation/kbuild/kconfig-language.txt.
+mainmenu "Akosix/$ARCH $KERNELVERSION Configuration"
+config KERNELVERSION
+    string
+option env="KERNELVERSION"
+
+menu "Build options"
+    config CONFIG_TEST
+    string "Just a test"
+    help
+        Testing...
+endmenu

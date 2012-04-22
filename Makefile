@@ -10,17 +10,30 @@ PERL = perl
 CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb -m32
 ASFLAGS := -Wall -Wextra -Werror -ggdb -m32
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
-INCLUDES := -I include -I lib/include
+INCLUDES := -I include -I lib/include -I . 
 TMP_TARGET := .tmp_akosix.bin
 TARGET := akosix.bin
 MAPFILE := kernel.map
 ISO := akosix.iso 
 DIST := dist/
+VERSION = "0.1-alpha"
 
 OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
-all: $(TARGET)
+
+all: kconfig $(TARGET)
+	@echo "You can run 'make config' to configure..."
+
+kconfig: Kconfig .config
+	@make -C build/kconfig/
+
+menuconfig: config
+conf: config
+config:
+	@export KERNELVERSION=$(VERSION)
+	@build/kconfig/mconf Kconfig
+	@$(PERL) scripts/genconf.pl
 
 %.o : %.c
 	@echo "CC $*.c"
@@ -53,12 +66,14 @@ $(TARGET): $(OBJECTS) $(TMP_TARGET)
 	@$(LD) $(LDFLAGS) -o $(TARGET) -ggdb $(OBJECTS) $(KSYM_OBJ) -Map $(MAPFILE)
 
 help:
-	@echo "make       - Build and link the whole kernel"	
-	@echo "make iso   - Build an iso image"	
-	@echo "make qemu  - Test the kernel in qemu"	
-	@echo "make bochs - Test the kernel in bochs"	
-	@echo "make clean - Clean the working directory"
+	@echo "make        - Build and link the whole kernel"	
+	@echo "make iso    - Build an iso image"	
+	@echo "make qemu   - Test the kernel in qemu"	
+	@echo "make bochs  - Test the kernel in bochs"	
+	@echo "make config - Start the configuration utility"
+	@echo "make clean  - Clean the working directory"
 
 .PHONY: clean
 clean:
-	$(RM) -rf $(OBJECTS) $(TARGET) $(TMP_TARGET) $(MAPFILE) $(ISO) $(DIST)
+	$(RM) -rf $(OBJECTS) $(TARGET) $(TMP_TARGET) $(MAPFILE) $(ISO) $(DIST) config.h
+	make clean -C build/kconfig/
