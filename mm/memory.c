@@ -16,7 +16,6 @@ struct kmalloc_area {
     LIST_ENTRY(kmalloc_area)   ka_entries;
     STAILQ_ENTRY(kmalloc_area) ka_free_entries;
 };
-
 #define CHECK_KMALLOC_AREA_MAGIC(ptr)  do { \
 if ((ptr)->ka_magic != KMALLOC_AREA_MAGIC) { \
    kprintf("Panic! Kernel heap corrupted at: %p\n", (void *)ptr); \
@@ -38,7 +37,8 @@ void memory_init(struct multiboot_info *mbi)
     unsigned int size;
     const char *avail = NULL;
     mb_mmap_t *mmap = (mb_mmap_t *)mbi->mmap_addr;
-    kheap_start = &__end_data_kernel;
+    kheap_start = (uint32_t)&__end_data_kernel;
+    kheap_end = kheap_start;
 
     if (!(mbi->flags & MB_INFO_MEM_MAP)) {
         kprintf("Fatal error! No memory mapping information found!\n");
@@ -54,7 +54,7 @@ void memory_init(struct multiboot_info *mbi)
         if (mmap->addr == 0x100000 
                 && mmap->type == MB_MEMORY_AVAILABLE) {
             pmm_init(mmap->addr, mmap->length);
-            kheap_max = VADDR((uint32_t)length_addr);
+            kheap_max = (uint32_t)VADDR((uint32_t)length_addr);
         }
 
         mmap = (mb_mmap_t *)((uint32_t)mmap
@@ -65,9 +65,11 @@ void memory_init(struct multiboot_info *mbi)
 void *expand_kheap(size_t size)
 {
     void *alloc = NULL;
+#if 0
     if (kheap_end + size > kheap_max) {
        return NULL;
     }
+#endif
     alloc = (void *)kheap_end;
     kheap_end += size;
     return alloc;
@@ -84,8 +86,8 @@ void *contract_kheap(size_t size)
 
 void *kmalloc(size_t size, malloc_flags_t flags)
 {
-   void *ptr;
-   struct kmalloc_area *marea;
+   void *ptr = NULL;
+   struct kmalloc_area *marea = NULL;
    struct kmalloc_area *tmp, *mtmp;
 
    if (size == 0)
@@ -107,37 +109,20 @@ void *kmalloc(size_t size, malloc_flags_t flags)
            marea = (struct kmalloc_area *)ptr;
            ptr += sizeof(struct kmalloc_area);
        }
-   } else if (flags & M_ALIGNED) {
-       void *kbrk = expand_kheap(0);
-       void *aligned_ptr = PAGE_ALIGN(kbrk) + PAGE_SIZE;
-       if (((unsigned int)(aligned_ptr - kbrk)) > (sizeof(struct kmalloc_area)*2)) {
-           /* We need a free block to cover the gap between the last allocated
-            * area and the new aligned area. It must have enough room to con-
-            * tain it's own kmalloc_area and the new aligned kmalloc_area. */
-           kfree(kmalloc(aligned_ptr-kbrk-(sizeof(struct kmalloc_area)*2), M_NORMAL));
-       } else { /* Too small to create a free gap */
-           /* TODO */
-       }
-       marea = (struct kmalloc_area *)
-                expand_kheap(sizeof(struct kmalloc_area) + size);
-       ptr = (void *)marea + sizeof(struct kmalloc_area);
-   } else {
-       return NULL;
-   }
-
+   } 
    marea->ka_size = size;
    marea->ka_magic = KMALLOC_AREA_MAGIC;
    marea->ka_flags = KMALLOC_AREA_USED;
-   if (last_mem_area != NULL) {
+   if (last_mem_area == NULL) {
+       LIST_INSERT_HEAD(&mem_areas, marea, ka_entries);
+   } else {
        CHECK_KMALLOC_AREA_MAGIC(last_mem_area);
        LIST_INSERT_AFTER(last_mem_area, marea, ka_entries);
-   } else {
-       LIST_INSERT_HEAD(&mem_areas, marea, ka_entries);
    }
    last_mem_area = marea;
 
    if (flags & M_ZEROED) {
-       memclr(ptr, sizeof(size));
+       memclr(ptr, size);
    }
    return ptr;
 }
@@ -149,13 +134,17 @@ void kfree(void *ptr)
     if (ptr == NULL)
         return;
 
-    marea = (struct kmalloc_area *)ptr - sizeof(struct kmalloc_area);
+    marea = (struct kmalloc_area *)ptr;
+    marea--; /* Very strange, but works */
     CHECK_KMALLOC_AREA_MAGIC(marea);
     if (marea->ka_size > biggest_free_size)
         biggest_free_size = marea->ka_size;
 
-    marea->ka_flags &= KMALLOC_AREA_USED;
-    STAILQ_INSERT_TAIL(&free_mem_areas, marea, ka_free_entries);
+    marea->ka_flags ^= KMALLOC_AREA_USED;
+    if (marea->ka_size < biggest_free_size)
+        STAILQ_INSERT_TAIL(&free_mem_areas, marea, ka_free_entries);
+    else
+        STAILQ_INSERT_HEAD(&free_mem_areas, marea, ka_free_entries);
 }
 
 #ifdef CONFIG_DEBUG_KMALLOC
@@ -167,17 +156,41 @@ void dump_kmallocs(void)
         kprintf("No allocations, yet.\n");
     } else {
         LIST_FOREACH(tmp, &mem_areas, ka_entries) {
-            kprintf("Allocation size: %d\n"
-                    "Allocation start: %p\n"
-                    "Type: %s\n"
-                    "Magic %s\n\n"
-                    , tmp->ka_size, (void *)tmp + sizeof(struct kmalloc_area)
-                    , (tmp->ka_flags & KMALLOC_AREA_USED) ? "used" : "free"
-                    , (tmp->ka_magic == KMALLOC_AREA_MAGIC) ? "correct" : "uncorrect");
+            dump_kmalloc_area(tmp);
+        }
+    }
+    kprintf("Free areas:\n");
+    if (STAILQ_EMPTY(&free_mem_areas)) {
+        kprintf("No allocations, yet.\n");
+    } else {
+        STAILQ_FOREACH(tmp, &free_mem_areas, ka_free_entries) {
+            dump_kmalloc_area(tmp);
         }
     }
     kprintf("---- END OF DUMPING ALLOCATIONS -----\n");
 }
+
+void dump_kmalloc_area(struct kmalloc_area *ma)
+{
+    kprintf("Allocation size: %d\n"
+            "Allocation at: %p\n"
+            "Descriptor at: %p\n"
+            "Type: %s\n"
+            "Magic %s\n\n"
+            , ma->ka_size, (void *)ma + sizeof(struct kmalloc_area)
+            , ma
+            , (ma->ka_flags & KMALLOC_AREA_USED) ? "used" : "free"
+            , (ma->ka_magic == KMALLOC_AREA_MAGIC) ? "correct" : "uncorrect");
+}
+
+void dump_kmalloc(void *ptr)
+{
+    struct kmalloc_area *ma = (struct kmalloc_area *)ptr;
+    ma--;
+    dump_kmalloc_area(ma);
+}
 #else 
 void dump_kmallocs(void) {}
+void dump_kmalloc_area(struct kmalloc_area *ma __unused) {}
+void dump_kmalloc(void *p __unused) {}
 #endif /* CONFIG_DEBUG_KMALLOC */

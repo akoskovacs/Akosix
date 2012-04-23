@@ -17,18 +17,18 @@ void *expand_kheap(size_t size);
 void *contract_kheap(size_t size);
 
 typedef enum {
-    M_NORMAL   = 0x000, 
-    M_ALIGNED  = 0x001,
-    M_USER     = 0x002,
-    M_ZEROED   = 0x003
+    M_NORMAL   = 0x001, 
+    M_ALIGNED  = 0x002,
+    M_USER     = 0x004,
+    M_ZEROED   = 0x008
 } malloc_flags_t;
 
 void *kmalloc(size_t, malloc_flags_t);
 void kfree(void *);
 
-vaddr_t kheap_start;
-vaddr_t kheap_end;
-vaddr_t kheap_max;
+uint32_t kheap_start;
+uint32_t kheap_end;
+uint32_t kheap_max;
 uint8_t __end_data_kernel;
 
 /* pmm.c */
@@ -42,6 +42,9 @@ pfn_t pmm_first_frames(int);
 void pmm_alloc_frame(page_t *);
 void pmm_free_frame(page_t *);
 
+struct kmalloc_area;
 void dump_kmallocs(void);
+void dump_kmalloc_area(struct kmalloc_area *);
+void dump_kmalloc(void *);
 
 #endif // MEMORY_H
