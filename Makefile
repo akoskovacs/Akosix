@@ -37,7 +37,7 @@ config: .config
 	@$(PERL) scripts/genconf.pl
 	@echo "Now, you can simply run 'make' to build Akosix"
 
-%.o : %.c
+%.o : %.c config.h
 	@echo "CC $*.c"
 	@$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
 
@@ -77,5 +77,8 @@ help:
 
 .PHONY: clean
 clean:
-	$(RM) -rf $(OBJECTS) $(TARGET) $(TMP_TARGET) $(MAPFILE) $(ISO) $(DIST) config.h
+	$(RM) -rf $(OBJECTS) $(TARGET) $(TMP_TARGET) $(MAPFILE) $(ISO) $(DIST)
+
+.PHONY: kconfig_clean
+kconfig_clean:
 	make clean -C build/kconfig/
