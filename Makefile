@@ -16,7 +16,8 @@ TARGET := akosix.bin
 MAPFILE := kernel.map
 ISO := akosix.iso 
 DIST := dist/
-VERSION = "0.1-alpha"
+VERSION = 0.1-alpha
+export KERNELVERSION := $(VERSION)
 
 OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o
 KSYM_OBJ := ksymbol.o
@@ -25,14 +26,12 @@ KSYM_SRC := ksymbol.c
 all: $(TARGET) 
 
 kconfig: 
-	@export KERNELVERSION=$(VERSION)
 	@make -C build/kconfig/
 
 menuconfig: .config
 conf: .config
 config: .config
 .config: kconfig
-	@export KERNELVERSION=$(VERSION)
 	@build/kconfig/mconf Kconfig
 	@$(PERL) scripts/genconf.pl
 	@echo "Now, you can simply run 'make' to build Akosix"
@@ -41,7 +40,7 @@ config: .config
 	@echo "CC $*.c"
 	@$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
 
-%.o : %.S
+%.o : %.S config.h
 	@echo "AS $*.S"
 	@$(AS) $(ASFLAGS) -c -o $*.o $*.S
 	
