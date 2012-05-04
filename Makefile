@@ -26,6 +26,9 @@ KSYM_SRC := ksymbol.c
 all: $(TARGET) 
 
 kconfig: 
+        @export CC=$(CC)
+        @export CFLAGS=$(CC)
+        @export LD=$(LD)
 	@make -C build/kconfig/
 
 menuconfig: .config
