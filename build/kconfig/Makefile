@@ -1,4 +1,3 @@
-CC = gcc
 RM = rm -rf
 OBJECTS := mconf.o zconf.tab.o lxdialog/checklist.o lxdialog/util.o lxdialog/inputbox.o lxdialog/textbox.o lxdialog/yesno.o lxdialog/menubox.o
 TARGET = mconf
