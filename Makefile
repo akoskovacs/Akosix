@@ -7,6 +7,8 @@ SH  = bash
 QEMU = qemu
 PERL = perl
 
+VERBOSE_BUILD = false
+
 CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb -m32
 ASFLAGS := -Wall -Wextra -Werror -ggdb -m32 -I .
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
@@ -22,6 +24,11 @@ export KERNELVERSION := $(VERSION)
 OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
+ifeq ($(VERBOSE_BUILD),true)
+	COMP=$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
+else
+	COMP=@$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
+endif
 
 all: $(TARGET) 
 
@@ -41,7 +48,7 @@ config: .config
 
 %.o : %.c config.h
 	@echo "CC $*.c"
-	@$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
+	$(COMP)
 
 %.o : %.S config.h
 	@echo "AS $*.S"
