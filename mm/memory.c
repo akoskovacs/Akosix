@@ -97,6 +97,8 @@ void *kmalloc(size_t size, malloc_flags_t flags)
        if (!STAILQ_EMPTY(&free_mem_areas) && size <= biggest_free_size) {
            STAILQ_FOREACH_MUTABLE(tmp, &free_mem_areas, ka_free_entries, mtmp) {
                if (tmp->ka_size >= size) {
+                   /* Yeah! We have a free()'d space which is enough for our new allocation.
+                      Get, and remove it from the free queue. */
                    marea = tmp;
                    ptr += sizeof(struct kmalloc_area);
                    STAILQ_REMOVE(&free_mem_areas, tmp, kmalloc_area, ka_free_entries);
@@ -110,15 +112,23 @@ void *kmalloc(size_t size, malloc_flags_t flags)
            ptr += sizeof(struct kmalloc_area);
        }
    } 
+
    marea->ka_size = size;
-   marea->ka_magic = KMALLOC_AREA_MAGIC;
    marea->ka_flags = KMALLOC_AREA_USED;
+
    if (last_mem_area == NULL) {
        LIST_INSERT_HEAD(&mem_areas, marea, ka_entries);
    } else {
        CHECK_KMALLOC_AREA_MAGIC(last_mem_area);
-       LIST_INSERT_AFTER(last_mem_area, marea, ka_entries);
+       /* In some cases the allocator reuses some free()'d space. Chunks
+        * which are already initialized and added to the list. Doesn't do it again!
+       */
+       if (marea->ka_magic != KMALLOC_AREA_MAGIC) {
+           LIST_INSERT_AFTER(last_mem_area, marea, ka_entries);
+       }
    }
+   /* XXX: This should be the last. See above! */
+   marea->ka_magic = KMALLOC_AREA_MAGIC;
    last_mem_area = marea;
 
    if (flags & M_ZEROED) {
@@ -135,7 +145,7 @@ void kfree(void *ptr)
         return;
 
     marea = (struct kmalloc_area *)ptr;
-    marea--; /* Very strange, but works */
+    marea--;
     CHECK_KMALLOC_AREA_MAGIC(marea);
     if (marea->ka_size > biggest_free_size)
         biggest_free_size = marea->ka_size;
