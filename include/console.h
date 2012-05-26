@@ -33,6 +33,9 @@ void kpos_putchar(int, int, char);
 size_t kpos_print(int, int, const char *);
 void scroll_down_console(int);
 void scroll_up_console(int);
+void set_xy(int, int);
+int get_x(void);
+int get_y(void);
 
 size_t kprint(const char *);
 void move_cursor(int, int);

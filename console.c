@@ -7,8 +7,8 @@
 #include <types.h>
 #include <config.h>
 
-#define CONFIG_CONFIG_CONSOLE_WIDTH  80
-#define CONFIG_CONFIG_CONSOLE_HEIGHT 25
+#define CONFIG_CONSOLE_WIDTH  80
+#define CONFIG_CONSOLE_HEIGHT 25
 #define CONSOLE_LAST_COLUMN    CONFIG_CONSOLE_WIDTH - 1
 #define CONSOLE_LAST_ROW       CONFIG_CONSOLE_HEIGHT - 1
 #define TABSIZE        4
@@ -153,6 +153,15 @@ void print_spaces(int x, int y, int count)
         count--;
     }
 }
+
+void set_xy(int x, int y)
+{
+	pos_x = x;
+	pos_y = y;
+}
+
+int get_x(void) { return pos_x; }
+int get_y(void) { return pos_y; }
 
 void move_console_cursor(int x, int y)
 {
