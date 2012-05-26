@@ -9,9 +9,9 @@ PERL = perl
 
 VERBOSE_BUILD = false
 
-CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -ggdb -m32
-ASFLAGS := -Wall -Wextra -Werror -ggdb -m32 -I .
-LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -ggdb -T linker.ld
+CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -m32 -fno-leading-underscore -ggdb
+ASFLAGS := -Wall -Wextra -Werror -m32 -fno-leading-underscore -I . -ggdb
+LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -T linker.ld
 INCLUDES := -I include -I lib/include -I . 
 TMP_TARGET := .tmp_akosix.bin
 TARGET := akosix.bin
@@ -21,7 +21,7 @@ DIST := dist/
 VERSION = 0.1-alpha
 export KERNELVERSION := $(VERSION)
 
-OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o
+OBJECTS := kmain.o lib/string.o console.o lib/kprintf.o mm/memory.o boot/pgsetup.o boot/boot.o mm/pmm.o panic.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 ifeq ($(VERBOSE_BUILD),true)

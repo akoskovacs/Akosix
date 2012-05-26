@@ -16,6 +16,10 @@ menu "General settings"
     config EXPERIMENTAL
     bool "Show experimental options"
     default y
+
+    config PANIC_STRING
+    string "Panic message"
+    default "  AKOSIX KERNEL PANIC  "
 endmenu
 
 menu "Display"
