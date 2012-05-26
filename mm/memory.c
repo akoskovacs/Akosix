@@ -18,7 +18,7 @@ struct kmalloc_area {
 };
 #define CHECK_KMALLOC_AREA_MAGIC(ptr)  do { \
 if ((ptr)->ka_magic != KMALLOC_AREA_MAGIC) { \
-   kprintf("Panic! Kernel heap corrupted at: %p\n", (void *)ptr); \
+   kpanic("Kernel heap corrupted at: %p\n", (void *)ptr); \
    hang(); } } while (0)
 
 static size_t biggest_free_size = 0; 
@@ -47,9 +47,10 @@ void memory_init(struct multiboot_info *mbi)
     while (mmap < (mb_mmap_t *)((uint32_t)mbi->mmap_addr + mbi->mmap_length)) {
         length_addr = mmap->addr + mmap->length;
         size = mmap->length/1024;
-        kprintf("\t\t- 0x%X%X - 0x%X%X, size: %dKB [%s]\n"
-        , mmap->addr, length_addr, size
-        , (mmap->type == MB_MEMORY_RESERVED) ? "reserved" : "available");
+        if (size != 0 && mmap->addr != 0 && length_addr != 0)
+            kprintf("\t\t- 0x%X%X - 0x%X%X, size: %dKB [%s]\n"
+                , mmap->addr, length_addr, size
+                , (mmap->type == MB_MEMORY_RESERVED) ? "reserved" : "available");
 
         if (mmap->addr == 0x100000 
                 && mmap->type == MB_MEMORY_AVAILABLE) {
