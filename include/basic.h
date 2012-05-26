@@ -13,6 +13,7 @@
 #define PADDR(x) (paddr_t)(x - PAGE_OFFSET)
 
 #define PAGE_ALIGN(addr) (vaddr_t)(((uint32_t)addr) & (~0x0F))
+#define ROUNDUP(x,y) ((x + ((y)-1)) & ~((y)-1))
 
 /* Simple bit operations, works on the Nth bit of the value */
 #define SET_BIT(V, N) ((V) |= (1 << (N)))
