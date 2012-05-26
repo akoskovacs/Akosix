@@ -1,17 +1,17 @@
-#include <kernel.h>
 #include <console.h>
-#include <system.h>
-#include <string.h>
-#include <multiboot.h>
-#include <memory.h>
+#include <kernel.h>
 #include <ksymbol.h>
+#include <memory.h>
+#include <multiboot.h>
+#include <string.h>
+#include <system.h>
 
 void kmain(struct multiboot_info *mbi, unsigned int magic)
 {
    unsigned int mem = mbi->mem_upper + mbi->mem_lower;
-   struct multiboot_info *nmbi;
+   struct multiboot_info *nmbi, *an;
 
-   set_console_attributes(FG_COLOR_WHITE | LIGHT | BG_COLOR_BLUE);
+   set_console_attributes(FG_COLOR_WHITE | LIGHT | BG_COLOR_CYAN);
    console_init();
 
    if (magic != 0x2BADB002) {
@@ -45,8 +45,13 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
 
    memory_init(mbi);
    nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
-   kprintf("kmalloc() test (must be 0) %d\n", nmbi->mem_upper);
    void *km = get_symbol("kmalloc");
    kprintf("kmalloc(): %p\n", km);
-   /*kfree(nmbi);*/
+   an = kmalloc(sizeof(struct multiboot_info), M_NORMAL);
+   kfree(nmbi);
+   nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
+   kprintf("kmalloc() test (must be 0) %d\n", nmbi->mem_upper + nmbi->mem_lower);
+   void *sm = kmalloc(220, M_NORMAL);
+   if (strstr((const char *)mbi->cmdline, "test-panic") != NULL)
+       kpanic("Ooops something wrong happened on %p!" , sm);
 }
