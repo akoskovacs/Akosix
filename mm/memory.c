@@ -85,18 +85,6 @@ void *contract_kheap(size_t size)
     return (void *)kheap_end;
 }
 
-/* Round up a number to the highest power of 2 */
-unsigned int rtnpw2(unsigned int n)
-{
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    return ++n;
-}
-
 void *kmalloc(size_t size, malloc_flags_t flags)
 {
    void *ptr = NULL;
@@ -105,9 +93,7 @@ void *kmalloc(size_t size, malloc_flags_t flags)
 
    if (size == 0)
        return expand_kheap(0);
-   else
-       size = rtnpw2(size);
-
+   
    if (flags & M_NORMAL) {
        if (!STAILQ_EMPTY(&free_mem_areas) && size <= biggest_free_size) {
            STAILQ_FOREACH_MUTABLE(tmp, &free_mem_areas, ka_free_entries, mtmp) {
