@@ -59,6 +59,6 @@ int vsnprintf(char *, size_t, const char *, va_list);
 int snprintf(char *, size_t, const char *, ...);
 int kprintf(const char *fmt, ...);
 void __panic(struct x86_registers, const char *, ...);
-#define kpanic(fmt, ...) __panic(save_regs(), fmt, __VA_ARGS__)
+#define kpanic(fmt, ...) __panic(save_regs(), fmt, ## __VA_ARGS__)
 
 #define hang() do { } while (true)
