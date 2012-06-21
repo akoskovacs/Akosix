@@ -5,8 +5,8 @@
 #include <basic.h>
 #include <page.h>
 
-#define ADDR_TO_PFN(n) (PAGE_ALIGN((n)) / PAGE_SIZE)
-#define PFN_TO_ADDR(n) (PAGE_ALIGN((n)) / PAGE_SIZE)
+#define ADDR_TO_PFN(n) (((uint32_t)n) / PAGE_SIZE)
+#define PFN_TO_ADDR(n) (void *)(n * PAGE_SIZE)
 typedef uint32_t pfn_t;
 typedef uint32_t page_t;
 struct multiboot_info;
@@ -38,7 +38,7 @@ void pmm_set_frame(pfn_t);
 void pmm_clear_frame(pfn_t);
 bool pmm_is_free_frame(pfn_t);
 pfn_t pmm_first_frame(void);
-pfn_t pmm_first_frames(int);
+pfn_t pmm_first_frames(unsigned int);
 void pmm_alloc_frame(page_t *);
 void pmm_free_frame(page_t *);
 
