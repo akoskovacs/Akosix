@@ -6,7 +6,8 @@
 typedef unsigned long size_t;
 typedef unsigned long long off_t;
 typedef unsigned long paddr_t;
-typedef void * vaddr_t;
+/* Must be manually cast back to void* */
+typedef unsigned long vaddr_t;
 
 typedef unsigned char uint8_t;
 typedef unsigned short int uint16_t;
