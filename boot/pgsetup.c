@@ -2,14 +2,12 @@
  * This code setup the identity mapping and the higher half page tables and directories.
  * It simply returns the physical address of the page directory to the loader code.
  * Which is then enable the paging.
- *
- * TODO: Rewrite it in assembly
 */
 #include <types.h>
 #include <page.h>
 
-uint32_t page_directory[1024] __setup_data __align(PAGE_SIZE);
-uint32_t page_table[1024] __setup_data __align(PAGE_SIZE);
+long page_directory[1024] __setup_data __align(PAGE_SIZE);
+long page_table[1024] __setup_data __align(PAGE_SIZE);
 
 long __setup setup_pd(void)
 {
@@ -21,7 +19,7 @@ long __setup setup_pd(void)
         page_table[i] = (i * PAGE_SIZE) | PT_RW | PT_PRESENT;
     }
     
-    page_directory[0] = (uint32_t)page_table | PD_RW | PD_PRESENT;
+    page_directory[0] = (long)page_table | PD_RW | PD_PRESENT;
     page_directory[768] = page_directory[0];
     return (long)page_directory;
 }
