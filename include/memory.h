@@ -5,8 +5,8 @@
 #include <basic.h>
 #include <page.h>
 
-#define ADDR_TO_PFN(n) (((uint32_t)n) / PAGE_SIZE)
-#define PFN_TO_ADDR(n) (void *)(n * PAGE_SIZE)
+#define ADDR_TO_PFN(n) (((pfn_t)n) / PAGE_SIZE)
+#define PFN_TO_ADDR(n) vaddr_t(n * PAGE_SIZE)
 typedef uint32_t pfn_t;
 typedef uint32_t page_t;
 struct multiboot_info;

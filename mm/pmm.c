@@ -12,10 +12,12 @@ static size_t free_frames;
 void pmm_init(uint32_t start_addr, uint32_t length)
 {
     frame_count = (start_addr + length)/PAGE_SIZE;
-    free_frames = frame_count;
     frame_size = frame_count / sizeof(uint32_t);
     frame_bitmap = (uint32_t *)expand_kheap(frame_size);
     memclr(frame_bitmap, frame_size);
+    uint32_t used_frames = PADDR(kheap_end)/PAGE_SIZE;
+    /* Set the usage bit for the used pages */
+    pmm_first_frames(used_frames);
     /*init_vmm(start_addr, length);*/
 }
 
@@ -33,7 +35,7 @@ void pmm_clear_frame(pfn_t pfn)
     CLEAR_BIT(frame_bitmap[ind], off);
 }
 
-bool pmm_is_free_frame(uint32_t pfn)
+bool pmm_is_free_frame(pfn_t pfn)
 {
     uint32_t ind = pfn / 32;
     uint32_t off = pfn % 32;
@@ -60,18 +62,17 @@ pfn_t pmm_first_frame(void)
     return -1;
 }
 
-pfn_t pmm_first_frames(int count)
+pfn_t pmm_first_frames(unsigned int count)
 {
     pfn_t pfn = 0;
-    int c = count;
-    pfn = pmm_first_frame();
-    if (pfn == (pfn_t)-1) 
-        return -1;
+    if (free_frames < count)
+        return (pfn_t)-1;
 
+    pfn = pmm_first_frame();
     count--;
+
     while (count--) {
-        if (pmm_first_frame() == (pfn_t)-1) {
-        }
+        pmm_first_frame();
     }
     return pfn;
 }
@@ -82,15 +83,14 @@ void pmm_alloc_frame(page_t *p)
 
     frame = pmm_first_frame();
     if (frame == (pfn_t) -1)
-        return; /* Should panic */
+        return;
 
     SET_PAGE_FRAME(*p, frame); 
 }
 
 void pmm_free_frame(page_t *p)
 {
-    /*pfn_t frame = ADDR_TO_PFN(PAGE_FRAME(*p));*/
-    pfn_t frame = *p;
+    pfn_t frame = ADDR_TO_PFN(PAGE_FRAME(*p));
     pmm_clear_frame(frame);
     SET_PAGE_FRAME(*p, 0);
 }
