@@ -27,6 +27,7 @@
 #define CLEAR_PAGE_WRITEABLE(p) ((p) &= PG_RW)
 #define CLEAR_PAGE_DIRTY(p) ((p) &= PG_DIRTY)
 
+#define PAGE_TABLE_SIZE 1024
 /* Bit flags for page-directory entries */
 enum PDE_FLAGS {
     PD_PRESENT       = 0x01,
