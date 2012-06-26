@@ -14,7 +14,7 @@
  * included in all copies or substantial portions of the Software.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- *************************************************************************/
+ ************************************************************************/
 
 #include <console.h>
 #include <kernel.h>
@@ -23,6 +23,7 @@
 #include <multiboot.h>
 #include <string.h>
 #include <system.h>
+#include <panic.h>
 
 void kmain(struct multiboot_info *mbi, unsigned int magic)
 {
@@ -33,7 +34,7 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    console_init();
 
    if (magic != 0x2BADB002) {
-       kprint("Ooops, something went wrong! Terminated!n\n");
+       kpanic("Bad bootloader 'magic': %d [%x]", magic, magic); 
    }
 
    kprintf("Booting Akosix...\nAt kmain() %p\n", kmain);
@@ -70,6 +71,5 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
    kprintf("kmalloc() test (must be 0) %d\n", nmbi->mem_upper + nmbi->mem_lower);
    void *sm = kmalloc(220, M_NORMAL);
-   if (strstr((const char *)mbi->cmdline, "test-panic") != NULL)
-       kpanic("Ooops something wrong happened on %p!" , sm);
+   kpanic("Sorry dude! If you wanted some magic, you gonna have a bad time!" , sm);
 }
