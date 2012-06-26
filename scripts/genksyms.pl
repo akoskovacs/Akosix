@@ -61,7 +61,7 @@ sub symbol_flag {
         return "SYM_CODE";
     } elsif ($sym_type eq 'B' or $sym_type eq 'b'
                 or $sym_type eq 'a' or $sym_type eq 'A'
-                or $sym_type eq 'R') {
+                or $sym_type eq 'R' or $sym_type eq 'r') {
         return "SYM_BSS";
     } elsif ($sym_type eq 'd') {
         return "SYM_DATA";
