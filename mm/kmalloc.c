@@ -14,13 +14,14 @@
  * included in all copies or substantial portions of the Software.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- *************************************************************************/
+ ************************************************************************/
 
 #include <kernel.h>
 #include <memory.h>
 #include <queue.h>
 #include <types.h>
 #include <string.h>
+#include <panic.h>
 
 struct kmalloc_area {
 #define KMALLOC_AREA_MAGIC 0xDEAD
