@@ -15,6 +15,9 @@
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
  ************************************************************************/
+#ifndef KERNEL_H
+#define KERNEL_H
+
 #include <basic.h>
 #include <system.h>
 #include <types.h>
@@ -24,3 +27,4 @@ int snprintf(char *, size_t, const char *, ...);
 int kprintf(const char *fmt, ...);
 
 #define hang() do { } while (true)
+#endif // KERNEL_H
