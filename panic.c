@@ -40,7 +40,6 @@ static void __backtrace(char lines[LINE_COUNT][LINE_LEN], unsigned int max_frame
     unsigned int frame, eip;
     unsigned int *args;
     const char *sym_name;
-    unsigned int loader = (unsigned int)get_ksymbol("loader", SYM_FUNCTION);
     for (frame = 0; frame < max_frames; frame++) {
         eip = ebp[1];
         if (eip == 0)
@@ -50,8 +49,8 @@ static void __backtrace(char lines[LINE_COUNT][LINE_LEN], unsigned int max_frame
         args = &ebp[2];
         sym_name = get_ksymbol_name(eip);
         snprintf(lines[frame], LINE_LEN, "%x: %s()", eip, sym_name);
-        if (eip == loader)
-            return;
+        if ((strcmp("loader", sym_name)) == 0)
+            break;
     }
 }
 
