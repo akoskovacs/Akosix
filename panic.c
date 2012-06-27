@@ -24,12 +24,36 @@
 #include <types.h>
 #include <basic.h>
 #include <kernel.h>
+#include <ksymbol.h>
 #include <panic.h>
 #include <console.h>
 #include <string.h>
 #include <config.h>
 
-#define BSIZE    2 * CONFIG_CONSOLE_WIDTH
+#define BSIZE      2 * CONFIG_CONSOLE_WIDTH
+#define LINE_COUNT 11
+#define LINE_LEN   50
+
+static void __backtrace(char lines[LINE_COUNT][LINE_LEN], unsigned int max_frames)
+{
+    unsigned int *ebp = &max_frames - 3;
+    unsigned int frame, eip;
+    unsigned int *args;
+    const char *sym_name;
+    unsigned int loader = (unsigned int)get_ksymbol("loader", SYM_FUNCTION);
+    for (frame = 0; frame < max_frames; frame++) {
+        eip = ebp[1];
+        if (eip == 0)
+            break;
+
+        ebp = (unsigned int *)ebp[0];
+        args = &ebp[2];
+        sym_name = get_ksymbol_name(eip);
+        snprintf(lines[frame], LINE_LEN, "%x: %s()", eip, sym_name);
+        if (eip == loader)
+            return;
+    }
+}
 
 void __panic(struct x86_registers regs, const char *fmt, ...)
 {
@@ -40,6 +64,7 @@ void __panic(struct x86_registers regs, const char *fmt, ...)
     va_list ap;
     int x, y, i;
     union x86_regs_u r;
+    char trace[LINE_COUNT][LINE_LEN];
     r.s_reg = regs;
     console_attr_t basic_attrs = BG_COLOR_RED | FG_COLOR_WHITE;
     set_console_attributes(basic_attrs);
@@ -66,6 +91,10 @@ void __panic(struct x86_registers regs, const char *fmt, ...)
         low = r.a_reg[i] & 0xFFFF;
         kprintf("\t%s: %d [%x]\n", x86_register_name[i], high, high);
         kprintf("\t%s: %d [%x]\n", x86_register_name[++i], low, low);
+    }
+    __backtrace(trace, LINE_COUNT);
+    for (i = 0; i < LINE_COUNT; i++) {
+        kpos_print(CONFIG_CONSOLE_WIDTH-LINE_LEN+5, i+5, trace[i]);
     }
     hang();
 }

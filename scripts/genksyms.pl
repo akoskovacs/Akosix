@@ -58,6 +58,24 @@ void *get_ksymbol(const char *name, symbol_type_t flags)
     }
     return NULL;
 }
+
+const char *get_ksymbol_name(unsigned long address)
+{
+    unsigned int diff, max_diff = 0;
+    const char *name = NULL;
+    struct ksymbol *sym = sym_table;
+    max_diff = address - sym->ks_address;
+    do {
+        diff = address - sym->ks_address;
+        if (diff < max_diff) {
+            max_diff = diff;
+            name = sym->ks_name;
+        }
+        sym++;
+    } while (sym->ks_name != NULL || sym->ks_address != 0);
+
+    return name;
+}
 EOE
 
 sub symbol_flag {
