@@ -41,6 +41,8 @@ struct ksymbol {
     symbol_type_t ks_type;
     const char   *ks_name;
 };
+
+const char *get_ksymbol_name(unsigned long address) __weak;
 void *get_ksymbol(const char *, symbol_type_t) __weak;
 #define get_kfunction(name) get_ksymbol((name), SYM_CODE)
 #define get_kvar(name) get_ksymbol((name), SYM_VARIABLE)
