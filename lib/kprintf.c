@@ -22,7 +22,6 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ************************************************************************/
 #include <kernel.h>
-#include <console.h>
 #include <string.h>
 
 #define KPRINTF_BUFFER_SIZE 512
@@ -109,16 +108,31 @@ int snprintf(char *dest, size_t size, const char *fmt, ...)
     return ret;
 }
 
+/* Very, bad idea... */
+#define KPRINT_TEMPLATE \
+    int size;  \
+    va_list ap; \
+    va_start(ap, fmt); \
+    size = vsnprintf(buffer, KPRINTF_BUFFER_SIZE, fmt, ap); \
+    va_end(ap); 
+
 int kprintf(const char *fmt, ...)
 {
-    int size;
-    va_list ap;
-
-    va_start(ap, fmt);
-    size = vsnprintf(buffer, KPRINTF_BUFFER_SIZE, fmt, ap);
-    va_end(ap);
-
+    KPRINT_TEMPLATE
     kprint(buffer);
+    return size;
+}
 
+int kxya_printf(int x, int y, console_attr_t attr, const char *fmt, ...)
+{
+    KPRINT_TEMPLATE
+    kxya_print(x, y, attr, buffer);
+    return size;
+}
+
+int kxy_printf(int x, int y, const char *fmt, ...)
+{
+    KPRINT_TEMPLATE
+    kxy_print(x, y, buffer);
     return size;
 }

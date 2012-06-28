@@ -27,10 +27,14 @@
 #include <basic.h>
 #include <system.h>
 #include <types.h>
+#include <console.h> /* Just for console_attr_t */
 
 int vsnprintf(char *, size_t, const char *, va_list);
 int snprintf(char *, size_t, const char *, ...);
+
 int kprintf(const char *fmt, ...);
+int kxy_printf(int, int, const char *fmt, ...);
+int kxya_printf(int, int, console_attr_t,  const char *fmt, ...);
 
 #define hang() do { } while (true)
 #endif // KERNEL_H
