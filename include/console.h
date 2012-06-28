@@ -26,6 +26,12 @@
 
 #include <basic.h>
 #include <types.h>
+#include <config.h>
+
+#define CONFIG_CONSOLE_WIDTH  80
+#define CONFIG_CONSOLE_HEIGHT 25
+#define CONSOLE_LAST_COLUMN    CONFIG_CONSOLE_WIDTH - 1
+#define CONSOLE_LAST_ROW       CONFIG_CONSOLE_HEIGHT - 1
 
 typedef enum { 
     LIGHT            = 0x08,
@@ -52,8 +58,17 @@ void console_init();
 void clear_console();
 void set_console_attributes(console_attr_t);
 console_attr_t get_console_attributes(void);
-void kpos_putchar(int, int, char);
-size_t kpos_print(int, int, const char *);
+
+void kxya_putchar(int, int, console_attr_t, char);
+void kxy_putchar(int, int, char);
+void ka_putchar(console_attr_t, char);
+void kputchar(char);
+
+size_t kxya_print(int, int, console_attr_t, const char *);
+size_t kxy_print(int, int, const char *);
+size_t ka_print(console_attr_t, const char *);
+size_t kprint(const char *);
+
 void scroll_down_console(int);
 void scroll_up_console(int);
 void set_xy(int, int);

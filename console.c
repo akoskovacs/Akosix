@@ -21,19 +21,31 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ************************************************************************/
-/* General console driver */
+
+/*
+ * This is a generic 'console' driver. For PC's with videoram. 
+ *
+ * Functions here has the following naming scheme:
+ *  - kxy_*  : First two parameters are the x, y coordinates
+ *               between 0 and CONFIG_CONSOLE_(WIDTH|HEIGHT)
+ *
+ *  - ka_*   : First parameter is the console attribute, which
+ *                 determine the fore- and the background color, 
+ *                 like (FG_WHITE|BG_BLACK) and some others like BLINK
+ *
+ *  - kxya_* : Both the two above, with this order
+ *  - k*     : Ordinary functions like 'void kputchar(char)'
+ *                 and 'size_t kprint(const char *)' (without formatting)
+ *
+ * NOTE: To use printf() like formatting you must use kprintf()!
+*/
 
 #include <basic.h>
 #include <console.h>
 #include <string.h>
 #include <system.h>
 #include <types.h>
-#include <config.h>
 
-#define CONFIG_CONSOLE_WIDTH  80
-#define CONFIG_CONSOLE_HEIGHT 25
-#define CONSOLE_LAST_COLUMN    CONFIG_CONSOLE_WIDTH - 1
-#define CONSOLE_LAST_ROW       CONFIG_CONSOLE_HEIGHT - 1
 #define TABSIZE        4
 
 // Standard color screen in higher-half
@@ -66,7 +78,7 @@ void clear_console()
     print_spaces(0, 0, CONFIG_CONSOLE_WIDTH * CONFIG_CONSOLE_HEIGHT);
 }
 
-void kpos_putchar(int x, int y, char ch)
+void kxya_putchar(int x, int y, console_attr_t attr, char ch)
 {
     console_font_t font = 0;
 
@@ -82,11 +94,16 @@ void kpos_putchar(int x, int y, char ch)
     }
 
     font |= ch;
-    font |= (console_attributes << 8);
+    font |= (attr << 8);
     video_mem[y * CONFIG_CONSOLE_WIDTH + x] = font; // Copy to screen
 }
 
-void kputchar(char ch)
+void kxy_putchar(int x, int y, char ch)
+{
+    kxya_putchar(x, y, console_attributes, ch);
+}
+
+void ka_putchar(console_attr_t attr, char ch)
 {
     int i;
     int pos;
@@ -94,19 +111,19 @@ void kputchar(char ch)
         case '\n':
             pos = CONFIG_CONSOLE_WIDTH - pos_x + 1;
             for (i = 0 ; i < pos; i++) {
-                kputchar(' ');
+                ka_putchar(attr, ' ');
             }
         return;
 
         case '\t':
             for (i = 0 ; i < TABSIZE; i++) {
-                kputchar(' ');
+                ka_putchar(attr, ' ');
             }
         return;
     }
     
 
-    kpos_putchar(pos_x, pos_y, ch);
+    kxya_putchar(pos_x, pos_y, attr,  ch);
     if (pos_x > CONSOLE_LAST_COLUMN) { // At the end of the line
         pos_x = 0;
         pos_y++;
@@ -118,24 +135,35 @@ void kputchar(char ch)
     }
 }
 
-size_t kpos_print(int x, int y, const char *line)
+void kputchar(char ch)
+{
+    ka_putchar(console_attributes, ch);
+}
+
+size_t kxya_print(int x, int y, console_attr_t attr, const char *line)
 {
     size_t size = strlen(line);
     unsigned int i;              // shut up GCC
     for (i = 0; i < size; i++) {
-        kpos_putchar(x+i, y, line[i]);
+        kxya_putchar(x+i, y, attr, line[i]);
     }
     return size;
 }
 
-size_t kprint(const char *line) /* No formatting */
+size_t kxy_print(int x, int y, const char *line)
 {
-    size_t size = strlen(line);
-    unsigned int i;              // shut up GCC
-    for (i = 0; i < size; i++) {
-        kputchar(line[i]);
-    }
-    return size;
+    return kxya_print(x, y, console_attributes, line);
+}
+
+size_t ka_print(console_attr_t attr, const char *line)
+{
+    return kxya_print(pos_x, pos_y, attr, line);
+}
+
+/* For printf() like formatting, prefer kprintf() from include/kernel.h */
+size_t kprint(const char *line) 
+{
+    return kxya_print(pos_x, pos_y, console_attributes, line);
 }
 
 void scroll_up_console(int count)
@@ -171,7 +199,7 @@ void print_spaces(int x, int y, int count)
             x = 0;
             y++;
         }
-        kpos_putchar(x, y, ' ');
+        kxy_putchar(x, y, ' ');
         x++;
         count--;
     }
@@ -179,8 +207,11 @@ void print_spaces(int x, int y, int count)
 
 void set_xy(int x, int y)
 {
-	pos_x = x;
-	pos_y = y;
+    if (x > 0 && x < CONFIG_CONSOLE_WIDTH)
+        pos_x = x;
+
+    if (y > 0 && x < CONFIG_CONSOLE_HEIGHT)
+        pos_y = y;
 }
 
 int get_x(void) { return pos_x; }
