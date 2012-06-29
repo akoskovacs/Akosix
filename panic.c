@@ -34,9 +34,10 @@
 #define LINE_COUNT 11
 #define LINE_LEN   50
 
-static void __backtrace(char lines[LINE_COUNT][LINE_LEN], unsigned int max_frames)
+/* Use this function with care! */
+static void __backtrace(unsigned x, unsigned y, unsigned int max_frames)
 {
-    unsigned int *ebp = &max_frames - 3;
+    unsigned int *ebp = &x - 2;
     unsigned int frame, eip;
     unsigned int *args;
     const char *sym_name;
@@ -47,37 +48,44 @@ static void __backtrace(char lines[LINE_COUNT][LINE_LEN], unsigned int max_frame
 
         ebp = (unsigned int *)ebp[0];
         args = &ebp[2];
-        sym_name = get_ksymbol_name(eip);
-        snprintf(lines[frame], LINE_LEN, "%x: %s()", eip, sym_name);
-        if ((strcmp("loader", sym_name)) == 0)
+        if (args[2] == SOF_STACK_MAGIC)
             break;
+
+        sym_name = get_ksymbol_name(eip);
+        kxy_printf(x, y+frame, "%x: %s()", eip, sym_name);
     }
 }
 
-void __panic(struct x86_registers regs, const char *fmt, ...)
+#define CENTERED(size) ((CONFIG_CONSOLE_WIDTH-(size))/2)
+
+void __panic(struct x86_registers regs, const char *func, const char *file, int line,  const char *fmt, ...)
 {
     char buffer[BSIZE];
     const char *panic_str = CONFIG_PANIC_STRING; 
     size_t panic_str_len = strlen(panic_str);
-    size_t line_len = 0;
+    size_t buf_len = 0;
     va_list ap;
     int x, y, i;
     union x86_regs_u r;
-    char trace[LINE_COUNT][LINE_LEN];
     r.s_reg = regs;
-    console_attr_t basic_attrs = BG_COLOR_RED | FG_COLOR_WHITE;
-    set_console_attributes(basic_attrs);
-    clear_console(); 
     va_start(ap, fmt);
-    line_len = vsnprintf(buffer, BSIZE, fmt, ap);
+    /* Move the formatted message to the buffer[] */
+    buf_len = vsnprintf(buffer, BSIZE, fmt, ap);
     va_end(ap);
-    set_console_attributes(BG_COLOR_BLUE | LIGHT | FG_COLOR_WHITE | BLINK);
-    kpos_print((CONFIG_CONSOLE_WIDTH-panic_str_len)/2, 1, panic_str); 
-    set_console_attributes(basic_attrs);
-    if (line_len < CONFIG_CONSOLE_WIDTH) {
-        kpos_print((CONFIG_CONSOLE_WIDTH-line_len)/2, 3, buffer);
-    }
+    
+    /* Set the console color to white on red (Red Screen of Death :) */
+    set_console_attributes(BG_COLOR_RED | FG_COLOR_WHITE);
+    clear_console(); 
+    /* Write the 'AKOSIX KERNEL PANIC' or other 
+                                 user-defined panic string centered */
+    kxya_print(CENTERED(panic_str_len), 1, BG_COLOR_BLACK 
+                    | LIGHT | FG_COLOR_WHITE | BLINK, panic_str); 
+
+    /* The message with more ligher white, also centered */
+    kxya_print(CENTERED(buf_len), 3, BG_COLOR_RED|LIGHT|FG_COLOR_WHITE, buffer);
+
     set_xy(0, 5);
+    /* Register dump */
     for (i = 0; i <= X86_REG_EDI; i++) {
         kprintf("\t%s: %d [%x]\n", x86_register_name[i], r.a_reg[i], r.a_reg[i]);
     }
@@ -91,9 +99,8 @@ void __panic(struct x86_registers regs, const char *fmt, ...)
         kprintf("\t%s: %d [%x]\n", x86_register_name[i], high, high);
         kprintf("\t%s: %d [%x]\n", x86_register_name[++i], low, low);
     }
-    __backtrace(trace, LINE_COUNT);
-    for (i = 0; i < LINE_COUNT; i++) {
-        kpos_print(CONFIG_CONSOLE_WIDTH-LINE_LEN+5, i+5, trace[i]);
-    }
+    // __backtrace(CONFIG_CONSOLE_WIDTH-LINE_LEN+5, 5, 5);
+    /* Location of the panic file:function():line */
+    kxy_printf(0, CONSOLE_LAST_ROW, "%s:%s():%d", file, func, line);
     hang();
 }

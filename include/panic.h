@@ -30,6 +30,9 @@
  *                      You were warned!
 */
 
+#define EOF_STACK_MAGIC 0xE0F514C7
+#define SOF_STACK_MAGIC 0x514514C7
+
 struct __packed x86_registers {
 #define X86_REG_EAX      0
     uint32_t eax;
@@ -106,7 +109,8 @@ static inline struct x86_registers save_regs(void) {
     return r;
 }
 
-void __panic(struct x86_registers, const char *, ...);
-#define kpanic(fmt, ...) __panic(save_regs(), fmt, ## __VA_ARGS__)
+void __panic(struct x86_registers, const char *,  const char *, int,  const char *, ...);
+#define kpanic(fmt, ...) __panic(save_regs(), __FUNCTION__, __FILE__, __LINE__,  fmt, ## __VA_ARGS__)
+//void __backtrace(unsigned, unsigned, unsigned);
 
 #endif // PANIC_H
