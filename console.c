@@ -157,13 +157,18 @@ size_t kxy_print(int x, int y, const char *line)
 
 size_t ka_print(console_attr_t attr, const char *line)
 {
-    return kxya_print(pos_x, pos_y, attr, line);
+    size_t size = strlen(line);
+    unsigned int i;              // shut up GCC
+    for (i = 0; i < size; i++) {
+        ka_putchar(attr, line[i]);
+    }
+    return size;
 }
 
 /* For printf() like formatting, prefer kprintf() from include/kernel.h */
 size_t kprint(const char *line) 
 {
-    return kxya_print(pos_x, pos_y, console_attributes, line);
+    return ka_print(console_attributes, line);
 }
 
 void scroll_up_console(int count)
@@ -210,7 +215,7 @@ void set_xy(int x, int y)
     if (x > 0 && x < CONFIG_CONSOLE_WIDTH)
         pos_x = x;
 
-    if (y > 0 && x < CONFIG_CONSOLE_HEIGHT)
+    if (y > 0 && y < CONFIG_CONSOLE_HEIGHT)
         pos_y = y;
 }
 
