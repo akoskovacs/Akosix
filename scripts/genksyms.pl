@@ -64,7 +64,7 @@ const char *get_ksymbol_name(unsigned long address)
     unsigned int diff, max_diff = 0;
     const char *name = NULL;
     struct ksymbol *sym = sym_table;
-    max_diff = address - sym->ks_address;
+    max_diff = (unsigned int)-1; /* Maximal int size */
     do {
         diff = address - sym->ks_address;
         if (diff < max_diff) {
@@ -84,8 +84,7 @@ sub symbol_flag {
     if ($sym_type eq 'T' or $sym_type eq 't') {
         return "SYM_CODE";
     } elsif ($sym_type eq 'B' or $sym_type eq 'b'
-                or $sym_type eq 'a' or $sym_type eq 'A'
-                or $sym_type eq 'R' or $sym_type eq 'r') {
+                or $sym_type eq 'R') {
         return "SYM_BSS";
     } elsif ($sym_type eq 'd') {
         return "SYM_DATA";
@@ -102,6 +101,11 @@ if ($#ARGV+1 != 2) {
 push(@out_code, $out_header);
 foreach my $line (@nm_out) {
     if ($line =~ /(\w+) (\w) (\w+)/) {
+        # Exclude uneeded symbols
+        if ($2 eq 'a' or $2 eq 'A' or $2 eq 'r') {
+            next;
+        }
+
         $vtype = symbol_flag($2);
         push(@out_code, "\t{ 0x$1, $vtype, \"$3\" },\n");
     }
