@@ -61,6 +61,10 @@
 
 loader:
     mov   $(kernel_stack + STACKSIZE), %esp
+# 'Start of Stack' magic, later defined as SOF_STACK_MAGIC
+    pushl $0x514514C7
+# 'End of Stack' magic, later defined as EOF_STACK_MAGIC
+    movl  $0xE0F514C7, (kernel_stack)
     addl  $PAGE_OFFSET, %ebx
     pushl %eax
     pushl %ebx
