@@ -94,8 +94,8 @@ void __panic(struct x86_registers regs, const char *func, const char *file, int 
       elements to high and low variables to overcome this. */
     for (i = X86_REG_SS; i <= X86_REG_GS; i++) {
         uint16_t high, low;
-        high = r.a_reg[i] >> 16;
-        low = r.a_reg[i] & 0xFFFF;
+        high = r.a_reg[i] & 0x0000FFFF;
+        low = r.a_reg[i]  & 0xFFFF0000;
         kprintf("\t%s: %d [%x]\n", x86_register_name[i], high, high);
         kprintf("\t%s: %d [%x]\n", x86_register_name[++i], low, low);
     }
