@@ -3,7 +3,7 @@ compiler:
     - clang
     - gcc
 
-script: make clean && make
+script: make
 notifications:
     email:
         recipients:
