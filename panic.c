@@ -92,12 +92,12 @@ void __panic(struct x86_registers regs, const char *func, const char *file, int 
     kprintf("\n");
     /* Segment registers are 16 bit long. Split the 32 bit array 
       elements to high and low variables to overcome this. */
-    for (i = X86_REG_SS; i <= X86_REG_GS; i++) {
+    for (i = X86_REG_SS; i <= X86_REG_SS+3; i++) {
         uint16_t high, low;
         high = r.a_reg[i] >> 16;
-        low = r.a_reg[i] & 0xFFFF;
+        low = r.a_reg[i] & 0x0000FFFF;
         kprintf("\t%s: %d [%x]\n", x86_register_name[i], high, high);
-        kprintf("\t%s: %d [%x]\n", x86_register_name[++i], low, low);
+        kprintf("\t%s: %d [%x]\n", x86_register_name[i], low, low);
     }
     // __backtrace(CONFIG_CONSOLE_WIDTH-LINE_LEN+5, 5, 5);
     /* Location of the panic file:function():line */

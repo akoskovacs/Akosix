@@ -68,7 +68,8 @@ struct __packed x86_registers {
 
 union __packed x86_regs_u {
     struct x86_registers s_reg; 
-    uint32_t a_reg[8+3];
+    uint32_t a_reg[sizeof(struct x86_registers)
+                                /sizeof(uint32_t)];
 };
 
 /* Just to get the name, like for eax:
