@@ -15,8 +15,8 @@
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
 #########################################################################
-CC  = clang
-AS  = clang
+CC  = gcc
+AS  = gcc
 CAT = cat
 LD  = ld
 RM  = rm
@@ -27,7 +27,7 @@ PERL = perl
 VERBOSE_BUILD = false
 
 CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -m32 -ggdb
-ASFLAGS := -Wall -Wextra -Werror -m32 -ggdb
+ASFLAGS := -Wall -Wextra -Werror -m32 -ggdb -I .
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -T linker.ld
 INCLUDES := -I include -I lib/include -I . 
 TMP_TARGET := .tmp_akosix.bin
