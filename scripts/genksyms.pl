@@ -89,6 +89,7 @@ sub symbol_flag {
     } elsif ($sym_type eq 'd') {
         return "SYM_DATA";
     }
+    return "SYM_UNKNOWN";
 }
 
 #==~~~--- main ---~~~==#
@@ -97,12 +98,12 @@ if ($#ARGV+1 != 2) {
     die "Usage: [object file] [out code]";
 }
 
-
 push(@out_code, $out_header);
 foreach my $line (@nm_out) {
     if ($line =~ /(\w+) (\w) (\w+)/) {
         # Exclude uneeded symbols
-        if ($2 eq 'a' or $2 eq 'A' or $2 eq 'r') {
+        if ($2 eq 'a' or $2 eq 'A' or $2 eq 'r'
+            or $2 eq 'D') {
             next;
         }
 
