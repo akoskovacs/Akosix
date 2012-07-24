@@ -15,8 +15,8 @@
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
 #########################################################################
-CC  = gcc
-AS  = gcc
+CC  = clang
+AS  = clang
 CAT = cat
 LD  = ld
 RM  = rm
@@ -26,8 +26,8 @@ PERL = perl
 
 VERBOSE_BUILD = false
 
-CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -m32 -fno-leading-underscore -ggdb
-ASFLAGS := -Wall -Wextra -Werror -m32 -fno-leading-underscore -I . -ggdb
+CFLAGS   := -std=c99 -Wall -O3 -march=i586 -nostdinc -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -Wall -Wextra -Werror -ffreestanding -Wno-unused -m32 -ggdb
+ASFLAGS := -Wall -Wextra -Werror -m32 -ggdb
 LDFLAGS  := -nostartfiles -nodefaultlibs -nostdlib -static -T linker.ld
 INCLUDES := -I include -I lib/include -I . 
 TMP_TARGET := .tmp_akosix.bin
@@ -38,7 +38,7 @@ DIST := dist/
 VERSION = 0.1-alpha
 export KERNELVERSION := $(VERSION)
 
-OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o mm/pmm.o mm/memory.o mm/kmalloc.o
+OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o mm/pmm.o mm/vmm.o mm/memory.o mm/kmalloc.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 ifeq ($(VERBOSE_BUILD),true)

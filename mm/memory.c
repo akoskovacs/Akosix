@@ -47,8 +47,7 @@ void memory_init(struct multiboot_info *mbi)
 
         if (mmap->addr == 0x100000 
                 && mmap->type == MB_MEMORY_AVAILABLE) {
-            kprintf("Got address!\n");
-            pmm_init(mmap->addr, mmap->length);
+            vm_init(0x0, mmap->length + 0x100000);
             kheap_max = (uint32_t)VADDR((uint32_t)length_addr);
         }
 
