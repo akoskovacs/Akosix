@@ -21,7 +21,7 @@ CAT = cat
 LD  = ld
 RM  = rm
 SH  = bash
-QEMU = qemu
+QEMU = qemu-system-i386
 PERL = perl
 
 VERBOSE_BUILD = false
@@ -80,7 +80,7 @@ iso: $(TARGET)
 	@$(SH) scripts/make_iso.sh
 
 qemu: $(TARGET)
-	@qemu -kernel $(TARGET)
+	@$(QEMU) -kernel $(TARGET)
 
 bochs: iso
 	@$(SH) scripts/run_bochs.sh
