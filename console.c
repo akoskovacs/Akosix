@@ -68,6 +68,7 @@ console_attr_t get_console_attributes(void)
 
 void console_init()
 {
+    disable_cursor();
     if (console_attributes == 0)
         console_attributes = (FG_COLOR_BLUE | LIGHT | BG_COLOR_WHITE);
     clear_console();
@@ -232,4 +233,10 @@ void move_console_cursor(int x, int y)
     outb(0x3D5, temp >> 8);
     outb(0x3D4, 15);
     outb(0x3D5, temp);
+}
+
+void disable_cursor(void)
+{
+    outw(0x3D4,0x200A);
+    outw(0x3D4,0xB);
 }

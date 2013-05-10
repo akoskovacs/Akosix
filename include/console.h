@@ -74,6 +74,7 @@ void scroll_up_console(int);
 void set_xy(int, int);
 int get_x(void);
 int get_y(void);
+void disable_cursor(void);
 
 size_t kprint(const char *);
 void move_cursor(int, int);
