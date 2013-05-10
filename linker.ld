@@ -69,4 +69,9 @@ SECTIONS
         ebss = .;
     __end_data_kernel = .;
     }
+
+    .note ALIGN(page_size) : AT(ADDR(.note) - hhalf)
+    {
+        *(.note.gnu.build-id)
+    }
 }
