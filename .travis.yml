@@ -1,0 +1,11 @@
+language: c
+install: sudo apt-get install libc6-dev-i386
+compiler:
+    - gcc
+#    - clang
+script: make
+notifications:
+    email:
+        recipients:
+            - akoskovacs@gmx.com
+        on_faulure: always
