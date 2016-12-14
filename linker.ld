@@ -29,18 +29,33 @@ page_size = 4096;
 
 SECTIONS
 {
+    /* The multiboot header must be 
+       in the first 8192 bytes in the image,
+       therefore 4096 (0x1000) will be fine */
+    . = 0x00001000;
+    .multiboot_header :
+    {
+    __start_multiboot_header = .;
+        boot/multiboot.o
+    __end_multiboot_header = .;
+    }
+
+    /* This stage the paging is still 
+       not enabled (physical = virtual) */
     . = 0x00100000;
     .setup :
     {
     __start_setup = .;
-        *(.setup)
-        *(.setup.data)
-        boot/boot.o(.bss)
-        boot/boot.o(COMMON)
+        boot/boot.o
+        boot/pgsetup.o
     __end_setup = .;
     }
 
     /* Higher half */
+    /* The following code and data has to be mapped after 
+     * the first 3GB address space, giving the kernel 1GB usable
+     * address space. 
+     */
     . += 0xc0000000;
     .text : AT(ADDR(.text) - hhalf) 
     {

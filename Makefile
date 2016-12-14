@@ -21,7 +21,7 @@ CAT = cat
 LD  = ld
 RM  = rm
 SH  = bash
-QEMU = qemu
+QEMU = qemu-system-i386
 PERL = perl
 
 VERBOSE_BUILD = false
@@ -38,7 +38,7 @@ DIST := dist/
 VERSION = 0.1-alpha
 export KERNELVERSION := $(VERSION)
 
-OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o mm/pmm.o mm/memory.o mm/kmalloc.o
+OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o boot/multiboot.o mm/pmm.o mm/vmm.o mm/memory.o mm/kmalloc.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 ifeq ($(VERBOSE_BUILD),true)
@@ -76,11 +76,14 @@ $(TMP_TARGET): $(OBJECTS)
 	@$(LD) $(LDFLAGS) -o $@ $^
 
 iso: $(TARGET)
-	@echo "Creating akosix.iso with GRUB..."
+	@echo "Creating $(ISO) with GRUB..."
 	@$(SH) scripts/make_iso.sh
 
 qemu: $(TARGET)
-	@qemu -kernel $(TARGET)
+	@$(QEMU) -kernel $(TARGET)
+
+qemu-iso: iso
+	@$(QEMU) -cdrom $(ISO)
 
 bochs: iso
 	@$(SH) scripts/run_bochs.sh
@@ -94,12 +97,13 @@ $(TARGET): $(OBJECTS) $(TMP_TARGET) config.h
 	@$(LD) $(LDFLAGS) -o $(TARGET) -ggdb $(OBJECTS) $(KSYM_OBJ) -Map $(MAPFILE)
 
 help:
-	@echo "make        - Build and link the whole kernel"	
-	@echo "make iso    - Build an iso image"	
-	@echo "make qemu   - Test the kernel in qemu"	
-	@echo "make bochs  - Test the kernel in bochs"	
-	@echo "make config - Start the configuration utility"
-	@echo "make clean  - Clean the working directory"
+	@echo "make          - Build and link the whole kernel"	
+	@echo "make iso      - Build an iso image"	
+	@echo "make qemu     - Test the kernel in qemu"	
+	@echo "make qemu-iso - Test the ISO image in qemu"	
+	@echo "make bochs    - Test the kernel in bochs"	
+	@echo "make config   - Start the configuration utility"
+	@echo "make clean    - Clean the working directory"
 
 .PHONY: clean
 clean:
