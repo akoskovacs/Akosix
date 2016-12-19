@@ -26,7 +26,7 @@
 #include <ksymbol.h>
 #include <memory.h>
 #include <multiboot.h>
-#include <keyboard.h>
+#include <devices/input/keyboard.h>
 #include <string.h>
 #include <system.h>
 #include <panic.h>
@@ -79,21 +79,23 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    void *sm = kmalloc(220, M_NORMAL);
 //   kpanic("Sorry dude! If you wanted some magic, you gonna have a bad time!" , sm);
 
+   /* Test the console and keyboard */
    uint8_t pcd = 0;
    uint8_t scode = 1;
-   do {
+   forever {
        char ch = keyboard_read(&scode);
        if (pcd != scode) {
            // reboot on DEL
            if (scode == 0x53) {
                 ps2_kbd_reboot();
            }
+
            if (ch != '\0') {
                kprintf("%c", ch);
-           } else {
-               //kprintf("\nscancode: %p", scode);
            }
+           //kprintf("\nscancode: %p, (character: %c)", scode, ch);
+
            pcd = scode;
        }
-   } while (1);
+   }
 }
