@@ -1,9 +1,9 @@
 language: c
+install: sudo apt-get install libc6-dev-i386
 compiler:
-    - clang
     - gcc
-
-script: make -e
+#    - clang
+script: make
 notifications:
     email:
         recipients:

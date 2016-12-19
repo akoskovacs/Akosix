@@ -65,7 +65,7 @@ void __panic(struct x86_registers regs, const char *func, const char *file, int 
     size_t panic_str_len = strlen(panic_str);
     size_t buf_len = 0;
     va_list ap;
-    int x, j, i;
+    int x, y, i, j;
     union x86_regs_u r;
     r.s_reg = regs;
     va_start(ap, fmt);
@@ -92,13 +92,14 @@ void __panic(struct x86_registers regs, const char *func, const char *file, int 
     kprintf("\n");
     /* Segment registers are 16 bit long. Split the 32 bit array 
       elements to high and low variables to overcome this. */
-    for (i = j = X86_REG_SS; i < X86_REG_SS+3; i++, j++) {
+    for (j = i = X86_REG_SS; i <= X86_REG_GS-1; i++, j++) {
         uint16_t high, low;
-        high = r.a_reg[i] >> 16;
-        low = r.a_reg[i] & 0x0000FFFF;
-        kprintf("\t%s: %d [%x]\n", x86_register_name[j], low, low);
-        kprintf("\t%s: %d [%x]\n", x86_register_name[++j], high, high);
+        high = r.a_reg[j] & 0x0000FFFF;
+        low = r.a_reg[j]  & 0xFFFF0000;
+        kprintf("\t%s: %d [%x]\n", x86_register_name[i], high, high);
+        kprintf("\t%s: %d [%x]\n", x86_register_name[++i], low, low);
     }
+    
     // __backtrace(CONFIG_CONSOLE_WIDTH-LINE_LEN+5, 5, 5);
     /* Location of the panic file:function():line */
     kxy_printf(0, CONSOLE_LAST_ROW, "%s:%s():%d", file, func, line);

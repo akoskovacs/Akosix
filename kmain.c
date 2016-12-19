@@ -9,11 +9,11 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -26,6 +26,7 @@
 #include <ksymbol.h>
 #include <memory.h>
 #include <multiboot.h>
+#include <devices/input/keyboard.h>
 #include <string.h>
 #include <system.h>
 #include <panic.h>
@@ -39,7 +40,7 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    console_init();
 
    if (magic != 0x2BADB002) {
-       kpanic("Bad bootloader 'magic': %d [%x]", magic, magic); 
+       kpanic("Bad bootloader 'magic': %d [%x]", magic, magic);
    }
 
    kprintf("Booting Akosix...\nAt kmain() %p\n", kmain);
@@ -50,19 +51,19 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    kprintf("Paging enabled!\n\n");
    kprintf("Multiboot info:\n");
 
-   if (mbi->flags & MB_INFO_BOOTDEV) 
+   if (mbi->flags & MB_INFO_BOOTDEV)
        kprintf("\to Has multiboot bootdev\n");
-   if (mbi->flags & MB_INFO_CMDLINE) 
+   if (mbi->flags & MB_INFO_CMDLINE)
        kprintf("\to Has multiboot command line\n");
-   if (mbi->flags & MB_INFO_ELF_SECT) 
+   if (mbi->flags & MB_INFO_ELF_SECT)
        kprintf("\to Has multiboot elf section info\n");
-   if (mbi->flags & MB_INFO_DRIVE_INFO) 
+   if (mbi->flags & MB_INFO_DRIVE_INFO)
        kprintf("\to Has multiboot drive info\n");
-   if (mbi->flags & MB_INFO_VIDEO) 
+   if (mbi->flags & MB_INFO_VIDEO)
        kprintf("\to Has multiboot video info\n");
-   if (mbi->flags & MB_INFO_MODS) 
+   if (mbi->flags & MB_INFO_MODS)
        kprintf("\to Has multiboot module info\n");
-   if (mbi->flags & MB_INFO_MEMORY) 
+   if (mbi->flags & MB_INFO_MEMORY)
        kprintf("\to Has multiboot memory\n");
    if (mbi->flags & MB_INFO_MEM_MAP)
        kprintf("\to Has multiboot memory-map info:\n");
@@ -76,5 +77,25 @@ void kmain(struct multiboot_info *mbi, unsigned int magic)
    nmbi = kmalloc(sizeof(struct multiboot_info), M_NORMAL | M_ZEROED);
    kprintf("kmalloc() test (must be 0) %d\n", nmbi->mem_upper + nmbi->mem_lower);
    void *sm = kmalloc(220, M_NORMAL);
-   kpanic("Sorry dude! If you wanted some magic, you gonna have a bad time!" , sm);
+//   kpanic("Sorry dude! If you wanted some magic, you gonna have a bad time!" , sm);
+
+   /* Test the console and keyboard */
+   uint8_t pcd = 0;
+   uint8_t scode = 1;
+   forever {
+       char ch = keyboard_read(&scode);
+       if (pcd != scode) {
+           // reboot on DEL
+           if (scode == 0x53) {
+                ps2_kbd_reboot();
+           }
+
+           if (ch != '\0') {
+               kprintf("%c", ch);
+           }
+           //kprintf("\nscancode: %p, (character: %c)", scode, ch);
+
+           pcd = scode;
+       }
+   }
 }

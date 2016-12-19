@@ -9,11 +9,11 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -31,39 +31,39 @@ static inline
 void outb(uint16_t port, uint8_t value)
 {
     __asm__ __volatile__("outb %0, %1"
-            : 
+            :
             : "a"(value), "Nd"(port)
-            ); 
+            );
 }
 
 static inline
 void outw(uint16_t port, uint16_t value)
 {
     __asm__ __volatile__("outw %0, %1"
-            : 
+            :
             : "a"(value), "Nd"(port)
-            ); 
+            );
 }
 
-static inline 
+static inline
 uint8_t inb(uint16_t port)
 {
     uint8_t value;
-    __asm__ __volatile__("inb %1, %0" 
-    : "=a"(value) 
+    __asm__ __volatile__("inb %1, %0"
+    : "=a"(value)
     : "Nd"(port)
-    ); 
+    );
     return value;
 }
 
-static inline 
+static inline
 uint16_t inw(uint16_t port)
 {
     uint16_t value;
-    __asm__ __volatile__("inb %1, %0" 
-    : "=a"(value) 
+    __asm__ __volatile__("inb %1, %0"
+    : "=a"(value)
     : "Nd"(port)
-    ); 
+    );
     return value;
 }
 
@@ -72,7 +72,7 @@ static inline bool is_irq_on()
     int f;
     __asm__ __volatile__("pushf\n\tpopl %0"
     : "=g"(f));
-    return f & (1<<9);
+    return !!(f & (1<<9)); /* Must be a bool (8 bit size) */
 }
 
 static inline
@@ -125,6 +125,12 @@ void write_cr3(uint32_t value)
 {
     __asm__ __volatile("movl %0, %%cr3" : /* No output */
                                         : "r"(value));
+}
+
+static inline
+void halt(void)
+{
+    __asm__ __volatile__("hlt");
 }
 
 #endif // SYSTEM_H

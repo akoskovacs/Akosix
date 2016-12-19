@@ -28,10 +28,10 @@
 #include <types.h>
 
 typedef enum {
-    SYM_BSS  = 0x001,
-    SYM_DATA = 0x002,
-    SYM_CODE = 0x004,
-    SYM_UNKNOWN = 0x008,
+    SYM_BSS   = 0x001,
+    SYM_DATA  = 0x002,
+    SYM_CODE  = 0x004,
+    SYM_DEBUG = 0x008,
     SYM_ANY = SYM_BSS | SYM_CODE | SYM_DATA,
     SYM_VARIABLE = SYM_BSS | SYM_DATA,
     SYM_FUNCTION = SYM_CODE

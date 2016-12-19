@@ -86,8 +86,12 @@ sub symbol_flag {
     } elsif ($sym_type eq 'B' or $sym_type eq 'b'
                 or $sym_type eq 'R') {
         return "SYM_BSS";
-    } elsif ($sym_type eq 'd') {
+    } elsif ($sym_type eq 'd' or $sym_type eq 'D') {
         return "SYM_DATA";
+    } elsif ($sym_type eq 'N' or $sym_type eq 'n') {
+        return "SYM_DEBUG";
+    } else {
+        print STDERR "Error: Unknown symbol type '$sym_type'!\n"
     }
     return "SYM_UNKNOWN";
 }

@@ -1,5 +1,5 @@
 /************************************************************************
- *   Copyright (c) 2012 Ákos Kovács - Akosix operating system
+ *   Copyright (c) 2016 Ákos Kovács - Akosix operating system
  *              http://akoskovacs.github.com/Akosix
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -21,28 +21,32 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ************************************************************************/
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
-#include <config.h>
 #include <basic.h>
 
-typedef unsigned long size_t;
-typedef unsigned long long off_t;
-typedef unsigned long paddr_t;
-/* Must be manually cast back to void* */
-typedef unsigned long vaddr_t;
+enum KEYBOARD_KEYS {
+      KEY_INVALID, KEY_ESC
+    , KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6
+    , KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12
+    , KEY_HOME, KEY_END, KEY_INSERT, KEY_DEL
+    , KEY_CAPS_LOCK, KEY_LSHIFT, KEY_RSHIFT, KEY_LCTRL, KEY_RCTRL
+    , KEY_ALT, KEY_LALT = KEY_ALT, KEY_ALT_GR, KEY_RALT = KEY_ALT_GR
+    , KEY_PRINT_SCREEN, KEY_PG_UP, KEY_PG_DOWN
+    , KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
+    , KEY_FN, KEY_SUPER
+#if 0
+    , KEY_0 = '0', KEY_1 = '1', KEY_2 = '2', KEY_3 = '3', KEY_4 = '4'
+    , KEY_5 = '5', KEY_6 = '6', KEY_7 = '7', KEY_8 = '8', KEY_9 = '9'
+#endif
+};
 
-typedef unsigned char uint8_t;
-typedef unsigned short int uint16_t;
-typedef unsigned long uint32_t;
-typedef unsigned long long uint64_t;
 
-typedef signed char int8_t;
-typedef signed short int int16_t;
-typedef signed long int32_t;
-typedef signed long long int64_t;
+void keyboard_set_keymap(const char *);
+uint8_t keyboard_get_scancode(void);
+uint8_t keyboard_scancode_for(enum KEYBOARD_KEYS spec_key);
+char keyboard_read(uint8_t *scancode);
+void ps2_kbd_reboot(void);
 
-typedef enum __packed { false, true } bool;
-
-#endif // TYPES_H
+#endif // KEYBOARD_H

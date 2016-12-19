@@ -9,11 +9,11 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -23,14 +23,14 @@
  ************************************************************************/
 
 /*
- * This is a generic 'console' driver. For PC's with videoram. 
+ * This is a generic 'console' driver. For PC's with videoram.
  *
  * Functions here has the following naming scheme:
  *  - kxy_*  : First two parameters are the x, y coordinates
  *               between 0 and CONFIG_CONSOLE_(WIDTH|HEIGHT)
  *
  *  - ka_*   : First parameter is the console attribute, which
- *                 determine the fore- and the background color, 
+ *                 determine the fore- and the background color,
  *                 like (FG_WHITE|BG_BLACK) and some others like BLINK
  *
  *  - kxya_* : Both the two above, with this order
@@ -85,8 +85,13 @@ void kxya_putchar(int x, int y, console_attr_t attr, char ch)
 
     if (x > CONSOLE_LAST_COLUMN || y > CONSOLE_LAST_ROW)
         return;
-    
+
     switch (ch) {
+        case '\b':
+            x--;
+            ch = ' ';
+        break;
+
         case '\n': case '\r':
         return;
         case '\t':
@@ -109,6 +114,17 @@ void ka_putchar(console_attr_t attr, char ch)
     int i;
     int pos;
     switch (ch) {
+        case '\b':
+            /* Deleting the first character has
+             to throw back us to the previous line last character. */
+            if (pos_x == 0) {
+                pos_x = CONFIG_CONSOLE_WIDTH;
+                pos_y--;
+            }
+            pos_x--;
+            kxya_putchar(pos_x, pos_y, attr, ' ');
+        return;
+
         case '\n':
             pos = CONFIG_CONSOLE_WIDTH - pos_x + 1;
             for (i = 0 ; i < pos; i++) {
@@ -122,7 +138,7 @@ void ka_putchar(console_attr_t attr, char ch)
             }
         return;
     }
-    
+
 
     kxya_putchar(pos_x, pos_y, attr,  ch);
     if (pos_x > CONSOLE_LAST_COLUMN) { // At the end of the line
@@ -167,7 +183,7 @@ size_t ka_print(console_attr_t attr, const char *line)
 }
 
 /* For printf() like formatting, prefer kprintf() from include/kernel.h */
-size_t kprint(const char *line) 
+size_t kprint(const char *line)
 {
     return ka_print(console_attributes, line);
 }
@@ -181,7 +197,7 @@ void scroll_up_console(int count)
         }
     }
     pos_y = CONSOLE_LAST_ROW;
-    pos_x = 0; 
+    pos_x = 0;
     print_spaces(pos_x, pos_y, CONFIG_CONSOLE_WIDTH);
 }
 
@@ -194,7 +210,7 @@ void scroll_down_console(int count)
         }
     }
     pos_y = 0;
-    pos_x = 0; 
+    pos_x = 0;
     print_spaces(pos_x, pos_y, CONFIG_CONSOLE_WIDTH);
 }
 
