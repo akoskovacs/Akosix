@@ -127,4 +127,10 @@ void write_cr3(uint32_t value)
                                         : "r"(value));
 }
 
+static inline
+void halt(void)
+{
+    __asm__ __volatile__("hlt");
+}
+
 #endif // SYSTEM_H
