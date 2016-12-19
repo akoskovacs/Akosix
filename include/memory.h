@@ -53,7 +53,9 @@ uint32_t kheap_start;
 uint32_t kheap_end;
 uint32_t kheap_max;
 uint8_t __end_data_kernel;
+/* vmm.c */
 
+void vm_init(uint32_t, uint32_t);
 /* pmm.c */
 
 void pmm_init(uint32_t start_addr, uint32_t length);
