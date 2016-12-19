@@ -99,7 +99,7 @@ void keyboard_set_keymap(const char *map_name)
     }
 }
 
-int8_t keyboard_scancode_for(enum KEYBOARD_KEYS k)
+uint8_t keyboard_scancode_for(enum KEYBOARD_KEYS k)
 {
     if (k >= SPEC_KEY_FIRST && k <= SPEC_KEY_LAST) {
         return kbd_spec_keys[k];
