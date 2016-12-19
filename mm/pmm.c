@@ -41,7 +41,6 @@ void pmm_init(uint32_t start_addr, uint32_t length)
     uint32_t used_frames = PADDR(kheap_end)/PAGE_SIZE;
     /* Set the usage bit for the used pages */
     pmm_first_frames(used_frames);
-    /*init_vmm(start_addr, length);*/
 }
 
 void pmm_set_frame(pfn_t pfn)
