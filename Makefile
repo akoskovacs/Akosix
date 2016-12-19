@@ -38,7 +38,7 @@ DIST := dist/
 VERSION = 0.1-alpha
 export KERNELVERSION := $(VERSION)
 
-OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o boot/multiboot.o mm/pmm.o mm/vmm.o mm/memory.o mm/kmalloc.o
+OBJECTS := kmain.o panic.o console.o lib/string.o lib/kprintf.o boot/pgsetup.o boot/boot.o boot/multiboot.o mm/pmm.o mm/vmm.o mm/memory.o mm/kmalloc.o devices/input/ps2_kbd.o
 KSYM_OBJ := ksymbol.o
 KSYM_SRC := ksymbol.c
 ifeq ($(VERBOSE_BUILD),true)
