@@ -30,8 +30,9 @@ page_size = 4096;
 SECTIONS
 {
     /* The multiboot header must be 
-       in the first 8192 bytes in the image,
-       therefore 4096 (0x1000) will be fine */
+     * in the first 8192 bytes in the image,
+     * therefore 4096 (0x1000) will be fine.
+     */
     . = 0x00001000;
     .multiboot_header :
     {
@@ -41,7 +42,8 @@ SECTIONS
     }
 
     /* This stage the paging is still 
-       not enabled (physical = virtual) */
+     *  not enabled (physical = virtual).
+     */
     . = 0x00100000;
     .setup :
     {
