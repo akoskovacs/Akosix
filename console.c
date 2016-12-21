@@ -107,6 +107,7 @@ void kxya_putchar(int x, int y, console_attr_t attr, char ch)
 void kxy_putchar(int x, int y, char ch)
 {
     kxya_putchar(x, y, console_attributes, ch);
+    update_cursor();
 }
 
 void ka_putchar(console_attr_t attr, char ch)
@@ -249,6 +250,11 @@ void move_console_cursor(int x, int y)
     outb(0x3D5, temp >> 8);
     outb(0x3D4, 15);
     outb(0x3D5, temp);
+}
+
+void update_cursor(void)
+{
+    move_console_cursor(pos_x, pos_y);
 }
 
 void disable_cursor(void)

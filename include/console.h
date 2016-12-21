@@ -9,11 +9,11 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -33,7 +33,7 @@
 #define CONSOLE_LAST_COLUMN    CONFIG_CONSOLE_WIDTH - 1
 #define CONSOLE_LAST_ROW       CONFIG_CONSOLE_HEIGHT - 1
 
-typedef enum { 
+typedef enum {
     LIGHT            = 0x08,
     BLINK            = 0x80,
     BG_COLOR_RED     = 0x40,
@@ -74,6 +74,7 @@ void scroll_up_console(int);
 void set_xy(int, int);
 int get_x(void);
 int get_y(void);
+void update_cursor(void);
 void disable_cursor(void);
 
 size_t kprint(const char *);
