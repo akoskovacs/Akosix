@@ -37,10 +37,9 @@ SECTIONS
     __end_multiboot_header = .;
     }
 
-    /* This stage the paging is still
-     *  not enabled (physical = virtual).
+    /* This stage the paging is still not enabled.
+     * (physical = virtual)
      */
-    . = 0x00100000;
     .setup :
     {
     __start_setup = .;
