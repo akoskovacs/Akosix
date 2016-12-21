@@ -9,11 +9,11 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -29,11 +29,7 @@ page_size = 4096;
 
 SECTIONS
 {
-    /* The multiboot header must be 
-     * in the first 8192 bytes in the image,
-     * therefore 4096 (0x1000) will be fine.
-     */
-    . = 0x00001000;
+    . = 0x00100000;
     .multiboot_header :
     {
     __start_multiboot_header = .;
@@ -41,7 +37,7 @@ SECTIONS
     __end_multiboot_header = .;
     }
 
-    /* This stage the paging is still 
+    /* This stage the paging is still
      *  not enabled (physical = virtual).
      */
     . = 0x00100000;
@@ -54,12 +50,12 @@ SECTIONS
     }
 
     /* Higher half */
-    /* The following code and data has to be mapped after 
+    /* The following code and data has to be mapped after
      * the first 3GB address space, giving the kernel 1GB usable
-     * address space. 
+     * address space.
      */
     . += 0xc0000000;
-    .text : AT(ADDR(.text) - hhalf) 
+    .text : AT(ADDR(.text) - hhalf)
     {
     __start_cs_init = .;
         *(.init.text)
